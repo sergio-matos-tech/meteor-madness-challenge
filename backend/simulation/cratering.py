@@ -12,7 +12,7 @@ def crater_diameter(asteroid_id: id): # metros
     """
     k: empirical constant (~1.8 for rock)
     """
-    
+
     k = 1.8
     data = get_asteroid_data(asteroid_id)
 
@@ -34,7 +34,21 @@ def crater_depth(asteroid_id: id): # metros
         if energy_results:
             return 0.2 * energy_results['mean_diameter_m']
 
+def crater_area(asteroid_id): # metros^2
+    """
+    Calculates the crater area assuming a circular shape
+    """
+
+    data = get_asteroid_data(asteroid_id)
+
+    if data:
+        energy_results = calculate_impact_energy(data)
+        if energy_results:
+            radius = energy_results['mean_diameter_m'] / 2
+            return math.pi * radius**2
+
 # Standalone test block for this module
 if __name__ == "__main__":
     print(crater_diameter("3542519"))
     print(crater_depth("3542519"))
+    print(crater_area("3542519"))
