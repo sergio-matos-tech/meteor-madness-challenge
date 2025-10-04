@@ -11,19 +11,18 @@ def get_earthquake_data():
 
     response = requests.get(url, params=params)
 
-    # Verifica se a requisição foi bem-sucedida
+    # Check if the request was successful
     if response.status_code == 200:
         data = response.json()
 
-        # Retorna todas as informações possíveis (como dict)
+        # Return all possible information (as a dict)
         return data
     else:
-        raise Exception(f"Erro na requisição: {response.status_code}")
+        raise Exception(f"Request error: {response.status_code}")
 
-# Exemplo de uso
+# Example of usage
 if __name__ == "__main__":
     dados = get_earthquake_data()
 
-    # Exibir tudo formatado em JSON legível
+    # Print everything formatted as readable JSON
     print(json.dumps(dados, indent=4))
-
