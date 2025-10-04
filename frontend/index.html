@@ -19,17 +19,36 @@
             height: 100vh;
         }
 
-        .search-container {
-            display: flex;
-            justify-content: center;
-            width: 100vw;
-        }
-
-        .search {
+        #search {
             width: 70%;
             border-radius: 15px;
         }
-        
+
+        #options-container {
+            width: 70%;
+            border-radius: 15px;
+            list-style-type: none;
+            padding: 5px;
+        }
+
+        .option {
+            padding: 3px 20px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .option:hover {
+            background-color: #dfdfdf;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            width: 100vw;
+            gap: 6px;
+        }
+
         .over-map {
             z-index: 1000;
             position: fixed;
@@ -46,34 +65,31 @@
 </head>
 <body>
 
-    <div class="search-container">
-        <input class="over-map search form-control mt-3" type="text">
+    <div class="search-container over-map">
+        <input id="search" class="form-control mt-3" type="text">
+        <ul id="options-container" class="card"></ul>
     </div>
 
-    <div class="card over-map info m-3 ">
-        
-    </div>
+    <div class="card over-map info m-3 "></div>
     
     <div id="map"></div>
 
+
+    <!-- SCRIPTS -->
+
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
     <script src="js/jquery.js"></script>
-    
+
+    <!-- Search Bar -->
+    <script src="js/search.js"></script>
+
+    <!-- Map -->
     <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin="">
     </script>
-    
-    <script>
-
-        const map = L.map('map').setView([0, 0], 2);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        
-    </script>
+    <script src="js/map.js"></script>    
 
 </body>
 </html>
-
