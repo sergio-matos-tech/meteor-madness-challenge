@@ -3,47 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Meteor Madness</title>
-    <!-- Correct path to the CSS file -->
+
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+    <link
+        rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+
+    <style>
+        #map {
+            height: 100vh;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            width: 100vw;
+        }
+
+        .search {
+            width: 70%;
+            border-radius: 15px;
+        }
+        
+        .over-map {
+            z-index: 1000;
+            position: fixed;
+        }
+
+        .info {
+            width: 300px;
+            height: 200px;
+            border-radius: 15px;
+            bottom: 0;
+        }
+    </style>
+    
 </head>
 <body>
 
-    <header class="main-header">
-        <h1>Meteor Madness Simulation</h1>
-    </header>
+    <div class="search-container">
+        <input class="over-map search form-control mt-3" type="text">
+    </div>
 
-    <main class="container">
-        <div class="controls-and-info">
-            <div id="controls" class="card">
-                <h2>Controls</h2>
-                <label for="asteroid-select">Select Asteroid:</label>
-                <select id="asteroid-select">
-                    <option value="">--Please choose an asteroid--</option>
-                </select>
-            </div>
+    <div class="card over-map info m-3 ">
+        
+    </div>
+    
+    <div id="map"></div>
 
-            <div id="info-panel" class="card">
-                <h2>Asteroid Details</h2>
-                <p><strong>Name:</strong> <span id="info-name">N/A</span></p>
-                <p><strong>Max Diameter (km):</strong> <span id="info-diameter">N/A</span></p>
-                <p><strong>Velocity (km/s):</strong> <span id="info-velocity">N/A</span></p>
-            </div>
-        </div>
+    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+    <script src="js/jquery.js"></script>
+    
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+    </script>
+    
+    <script>
 
-        <div id="visualization-container" class="card">
-            <!-- *** FIX APPLIED HERE: Added class="viz-panel" *** -->
-            <div id="map-2d" class="viz-panel"></div>
-            <div id="scene-3d" class="viz-panel"></div>
-        </div>
-    </main>
+        const map = L.map('map').setView([0, 0], 2);
 
-    <!-- External libraries -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    <!-- Correct path to the JavaScript file -->
-    <script src="js/main.js"></script>
+        
+    </script>
+
 </body>
 </html>
 
