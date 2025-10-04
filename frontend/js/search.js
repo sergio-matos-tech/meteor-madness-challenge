@@ -24,8 +24,10 @@ function getOptions(query) {
         { id: 3, label: "meteoro terrível"}
     ]
 
+    const words = query.split(/\s+/)
+
     return options
-        .filter(opt => opt.label.includes(query))
+        .filter(opt => words.every(word => opt.label.includes(word)))
         .slice(0, limit)
 }
 
