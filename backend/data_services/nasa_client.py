@@ -47,3 +47,25 @@ if __name__ == "__main__":
         print(f"Name: {name}")
         print(f"Is potentially hazardous: {is_hazardous}")
         print(f"Estimated diameter (m): {diameter_min:.2f} - {diameter_max:.2f}")
+
+
+FEED_URL = "https://api.nasa.gov/neo/rest/v1/feed"
+
+def get_asteroids_for_date_range(start_date: str, end_date: str) -> dict:
+    """
+    Busca uma lista de asteroides para um intervalo de datas na API NeoWs da NASA.
+    """
+    print(f"Buscando lista de asteroides de {start_date} a {end_date}...")
+    params = {
+        "start_date": start_date,
+        "end_date": end_date,
+        "api_key": NASA_API_KEY
+    }
+    try:
+        response = requests.get(FEED_URL, params=params)
+        response.raise_for_status()
+        print("Lista recebida com sucesso!")
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar lista de asteroides: {e}")
+        return None
