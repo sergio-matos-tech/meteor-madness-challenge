@@ -4,25 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meteor Madness</title>
-    <!-- Corrected path to the CSS file -->
+    <!-- Correct path to the CSS file -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>Meteor Madness Simulation</h1>
 
-    <div id="controls">
+    <header class="main-header">
+        <h1>Meteor Madness Simulation</h1>
+    </header>
+
+    <main class="container">
+        <div class="controls-and-info">
+            <div id="controls" class="card">
+                <h2>Controls</h2>
+                <label for="asteroid-select">Select Asteroid:</label>
+                <select id="asteroid-select">
+                    <option value="">--Please choose an asteroid--</option>
+                </select>
+            </div>
+
+            <div id="info-panel" class="card">
+                <h2>Asteroid Details</h2>
+                <p><strong>Name:</strong> <span id="info-name">N/A</span></p>
+                <p><strong>Max Diameter (km):</strong> <span id="info-diameter">N/A</span></p>
+                <p><strong>Velocity (km/s):</strong> <span id="info-velocity">N/A</span></p>
+            </div>
         </div>
 
-    <div id="visualization-container">
-        <div id="map-2d"></div>
-        <div id="scene-3d"></div>
-    </div>
+        <div id="visualization-container" class="card">
+            <!-- *** FIX APPLIED HERE: Added class="viz-panel" *** -->
+            <div id="map-2d" class="viz-panel"></div>
+            <div id="scene-3d" class="viz-panel"></div>
+        </div>
+    </main>
 
-    <!-- Scripts are usually placed at the end of the body for faster page loading -->
+    <!-- External libraries -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- Corrected path to the JavaScript file -->
+    <!-- Correct path to the JavaScript file -->
     <script src="js/main.js"></script>
 </body>
 </html>
+
