@@ -20,13 +20,13 @@ def calculate_impact_energy(asteroid_data: dict) -> dict:
         mean_diameter = (diameter_min + diameter_max) / 2
         radius = mean_diameter / 2
 
-        # [cite_start]2. Calculate Mass in kg 
-        # [cite_start]Using the standard density for stony asteroids: 3000 kg/m^3 
+        # 2. Calculate Mass in kg 
+        # Using the standard density for stony asteroids: 3000 kg/m^3 
         density = 3000
         volume = (4/3) * math.pi * (radius ** 3)
         mass = density * volume
 
-        # [cite_start]3. Extract Velocity in m/s 
+        # 3. Extract Velocity in m/s 
         # The plan calls for selecting the relevant close approach event. For the MVP, we'll take the first one in the list.
         close_approach = asteroid_data['close_approach_data'][0]
         velocity_kms = float(close_approach['relative_velocity']['kilometers_per_second'])
