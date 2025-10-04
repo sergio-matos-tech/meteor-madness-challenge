@@ -9,41 +9,41 @@ BASE_URL = "https://api.nasa.gov/neo/rest/v1/neo/{asteroid_id}"
 
 def get_asteroid_data(asteroid_id: str) -> dict:
     """
-    Busca os dados detalhados de um asteroide específico na API NeoWs da NASA.
+    Fetches detailed data for a specific asteroid from NASA's NeoWs API.
 
     Args:
-        [cite_start]asteroid_id: O ID de referência do NASA JPL (SPK-ID).
+        asteroid_id: The NASA JPL reference ID (SPK-ID).
 
     Returns:
-        Um dicionário contendo os dados do asteroide.
+        A dictionary containing the asteroid data.
     """
-    print(f"Buscando dados para o asteroide ID: {asteroid_id}...")
+    print(f"Fetching data for asteroid ID: {asteroid_id}...")
     url = BASE_URL.format(asteroid_id=asteroid_id)
     params = {"api_key": NASA_API_KEY}
 
     try:
         response = requests.get(url, params=params)
         response.raise_for_status()
-        print("Dados recebidos com sucesso!")
+        print("Data received successfully!")
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"Erro ao buscar dados da NASA: {e}")
+        print(f"Error fetching data from NASA: {e}")
         return None
 
-# Bloco para testar este módulo de forma independente
+# Standalone test block for this module
 if __name__ == "__main__":
-    # [cite_start]ID do Apophis, usado como exemplo
+    # Apophis ID, used as an example
     test_asteroid_id = "3542519"
     data = get_asteroid_data(test_asteroid_id)
 
     if data:
-        # [cite_start]Extrai e imprime alguns campos-chave para verificação
+        # Extract and print some key fields for verification
         name = data.get("name")
         is_hazardous = data.get("is_potentially_hazardous_asteroid")
         diameter_min = data.get("estimated_diameter", {}).get("meters", {}).get("estimated_diameter_min")
         diameter_max = data.get("estimated_diameter", {}).get("meters", {}).get("estimated_diameter_max")
 
-        print(f"\n--- Resultados do Teste ---")
-        print(f"Nome: {name}")
-        print(f"É potencialmente perigoso: {is_hazardous}")
-        print(f"Diâmetro estimado (m): {diameter_min:.2f} - {diameter_max:.2f}")
+        print(f"\n--- Test Results ---")
+        print(f"Name: {name}")
+        print(f"Is potentially hazardous: {is_hazardous}")
+        print(f"Estimated diameter (m): {diameter_min:.2f} - {diameter_max:.2f}")
