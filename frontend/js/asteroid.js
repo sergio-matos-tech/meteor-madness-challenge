@@ -32,8 +32,8 @@ const asteroid = {
     },
     
     throw({ lat, lng }) {
-        const outerRadius = this.craterRadius * 1000;
-        const innerRadius = this.craterRadius * 1000 / 2; // TODO: Melhorar isso
+        const outerRadius = this.craterRadius * 1000 * 2;
+        const innerRadius = this.craterRadius * 1000; // TODO: Melhorar isso
 
         const outer = L.circle([lat, lng], {
             radius: 0,

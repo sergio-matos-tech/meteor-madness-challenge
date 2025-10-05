@@ -15,6 +15,13 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     
+    <style>
+        .controls-container {
+            max-width: 400px;
+        }
+
+    </style>
+
 </head>
 <body>
 
@@ -23,7 +30,7 @@
         <ul id="options-container" class="card"></ul>
     </div>
     
-    <div class="card over-map info m-3 bg-dark text-light">
+    <div class="card over-map info m-3 bg-dark text-light controls-container">
         <div id="asteroid" class="over-map"></div>
 
         <div class="card-body">
@@ -31,7 +38,7 @@
             
             <div class="slider-control">
                 <label for="mass-slider" class="form-label"><i class="fas fa-weight-hanging fa-fw"></i> Mass</label>
-                <input type="range" class="form-range" id="mass-slider" min="9" max="14" step="0.05">
+                <input type="range" class="form-range" id="mass-slider" min="9" max="15" step="0.05">
                 <span class="slider-value" id="mass-value">N/A</span>
             </div>
             <div class="slider-control">
@@ -41,7 +48,7 @@
             </div>
             <div class="slider-control">
                 <label for="velocity-slider" class="form-label"><i class="fas fa-tachometer-alt fa-fw"></i> Velocity</label>
-                <input type="range" class="form-range" id="velocity-slider" min="5" max="40" step="0.1">
+                <input type="range" class="form-range" id="velocity-slider" min="5" max="100" step="0.1">
                 <span class="slider-value" id="velocity-value">N/A</span>
             </div>
             

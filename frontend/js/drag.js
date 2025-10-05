@@ -3,6 +3,8 @@ let offsetX, offsetY, dragging = false
 let asteroidDefaultPosition = { left: null, top: null }
 
 dragableAsteroid.on("mousedown", (e) => {
+    if (dragging) return
+
     const pos = dragableAsteroid.position()
 
     asteroidDefaultPosition.left = dragableAsteroid.css("left")
