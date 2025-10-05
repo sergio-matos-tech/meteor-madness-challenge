@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,10 +7,9 @@
 	   <style>
 		   body { margin: 0; background: #111122; color: #fff; }
 		   #threejs-container { width: 100vw; height: 100vh; display: block; }
-		   .back-btn {
+		   .action-btn {
 			   position: absolute;
 			   top: 20px;
-			   left: 20px;
 			   z-index: 1100;
 			   width: 180px;
 			   height: auto;
@@ -27,15 +25,26 @@
 			   cursor: pointer;
 			   transition: background 0.2s;
 		   }
-		   .back-btn:hover {
+           .action-btn:hover {
 			   background-color: rgba(33, 37, 41, 1);
 		   }
+		   .back-btn {
+			   left: 20px;
+		   }
+           .launch-btn {
+               left: 220px;
+               background-color: rgba(220, 53, 69, 0.9);
+           }
+           .launch-btn:hover {
+               background-color: rgba(220, 53, 69, 1);
+           }
 	   </style>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.min.js"></script>
 </head>
 <body>
-	<button class="back-btn" onclick="window.location.href='/'">Back</button>
+	<button class="action-btn back-btn" onclick="window.location.href='/'">Back</button>
+    <button class="action-btn launch-btn" id="launch-meteor-btn">Launch Meteor</button>
 	<div id="threejs-container"></div>
 	<script>
 		// --- Three.js Setup ---
@@ -64,7 +73,6 @@
 		controls.update();
 
 		// --- Solar System Demo ---
-		// Scaled for visibility, not real distances
 		const PLANETS = [
 			{ name: 'Mercury', color: 0xaaaaaa, radius: 10, distance: 400 },
 			{ name: 'Venus', color: 0xffcc99, radius: 18, distance: 600 },
@@ -76,28 +84,40 @@
 			{ name: 'Neptune', color: 0x3366cc, radius: 24, distance: 2600 }
 		];
 
+        const collidableObjects = []; // Array for collision detection
+
 		// Sun
 		const sunGeometry = new THREE.SphereGeometry(80, 64, 64);
 		const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 });
 		const sun = new THREE.Mesh(sunGeometry, sunMaterial);
 		sun.position.set(0, 0, 0);
+        sun.name = "Sun"; // Give it a name for identification
 		scene.add(sun);
+        collidableObjects.push(sun);
+        
+        let earthMesh;
 
 		// Add planets and orbits
 		PLANETS.forEach(planet => {
-			// Orbit
 			const orbitGeometry = new THREE.RingGeometry(planet.distance - 2, planet.distance + 2, 128);
 			const orbitMaterial = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
 			const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
 			orbit.rotation.x = Math.PI / 2;
 			scene.add(orbit);
-			// Planet
+			
 			const planetGeometry = new THREE.SphereGeometry(planet.radius, 32, 32);
 			const planetMaterial = new THREE.MeshPhongMaterial({ color: planet.color });
 			const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+            planetMesh.name = planet.name; // Give it a name
 			planetMesh.position.set(planet.distance, 0, 0);
 			scene.add(planetMesh);
-			// Label
+			
+            if (planet.name === 'Earth') {
+                earthMesh = planetMesh;
+            } else {
+                collidableObjects.push(planetMesh); // Add all other planets to collidable list
+            }
+
 			const div = document.createElement('div');
 			div.style.position = 'absolute';
 			div.style.color = '#fff';
@@ -115,16 +135,48 @@
 		sunLight.position.set(0, 0, 0);
 		scene.add(sunLight);
 
-		// Animate planets (simple circular orbits)
+        // --- Meteor Simulation ---
+        let meteor, impactEffect;
+        let startPosition;
+        let animationProgress = 0;
+        let isAnimatingMeteor = false;
+        const raycaster = new THREE.Raycaster(); // For collision detection
+
+        document.getElementById('launch-meteor-btn').addEventListener('click', () => {
+            if (isAnimatingMeteor) return;
+            if (meteor) scene.remove(meteor);
+            if (impactEffect) scene.remove(impactEffect);
+
+            const meteorGeometry = new THREE.SphereGeometry(5, 32, 32);
+            const meteorMaterial = new THREE.MeshBasicMaterial({ color: 0xff4500 });
+            meteor = new THREE.Mesh(meteorGeometry, meteorMaterial);
+
+            startPosition = new THREE.Vector3(
+                (Math.random() - 0.5) * 4000,
+                (Math.random() - 0.5) * 1000,
+                (Math.random() - 0.5) * 4000
+            );
+            meteor.position.copy(startPosition);
+            scene.add(meteor);
+            
+            animationProgress = 0;
+            isAnimatingMeteor = true;
+        });
+        
+        // --- Screen Shake ---
+        let isShaking = false;
+        let shakeStartTime = 0;
+        let shakeDuration = 0;
+        let shakeIntensity = 0;
+
 		function animate() {
 			const time = Date.now() * 0.0001;
 			PLANETS.forEach((planet, i) => {
-				const mesh = scene.children.find(obj => obj instanceof THREE.Mesh && obj.geometry.type === 'SphereGeometry' && obj.material.color.getHex() === planet.color);
+				const mesh = scene.children.find(obj => obj.name === planet.name);
 				if (mesh) {
 					const angle = time * (0.2 + i * 0.05);
 					mesh.position.x = Math.cos(angle) * planet.distance;
 					mesh.position.z = Math.sin(angle) * planet.distance;
-					// Label position
 					const vector = mesh.position.clone();
 					vector.project(camera);
 					const x = (vector.x * 0.5 + 0.5) * width;
@@ -133,13 +185,80 @@
 					mesh.userData.labelDiv.style.top = `${y}px`;
 				}
 			});
+
+            if (isAnimatingMeteor) {
+                const endPosition = earthMesh.position.clone();
+                const direction = new THREE.Vector3().subVectors(endPosition, meteor.position).normalize();
+                const speed = 2;
+
+                raycaster.set(meteor.position, direction);
+                const intersects = raycaster.intersectObjects(collidableObjects);
+
+                if (intersects.length > 0 && intersects[0].distance < speed) {
+                    isAnimatingMeteor = false;
+                    createImpactEffect(intersects[0].point);
+                    scene.remove(meteor);
+                } else {
+                    meteor.position.add(direction.multiplyScalar(speed));
+                    if (meteor.position.distanceTo(endPosition) < speed) {
+                        isAnimatingMeteor = false;
+                        createImpactEffect(endPosition);
+                        scene.remove(meteor);
+                    }
+                }
+            }
+
+            if (impactEffect) {
+                impactEffect.scale.x *= 1.0115; 
+                impactEffect.scale.y *= 1.0115;
+                impactEffect.scale.z *= 1.0115;
+                impactEffect.material.opacity *= 0.98;
+                if (impactEffect.material.opacity < 0.01) {
+                    scene.remove(impactEffect);
+                    impactEffect = null;
+                }
+            }
+
+            if (isShaking) {
+                const elapsedTime = Date.now() - shakeStartTime;
+                if (elapsedTime < shakeDuration) {
+                    const shakeAmount = shakeIntensity * (1 - (elapsedTime / shakeDuration));
+                    camera.position.x += (Math.random() - 0.5) * shakeAmount;
+                    camera.position.y += (Math.random() - 0.5) * shakeAmount;
+                    camera.position.z += (Math.random() - 0.5) * shakeAmount;
+                } else {
+                    isShaking = false;
+                }
+            }
+
 			controls.update();
 			renderer.render(scene, camera);
 			requestAnimationFrame(animate);
 		}
 		animate();
 
-		// Responsive resize
+        function createImpactEffect(position) {
+            const impactGeometry = new THREE.SphereGeometry(10, 32, 32);
+            const impactMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffa500,
+                transparent: true,
+                opacity: 0.8
+            });
+            impactEffect = new THREE.Mesh(impactGeometry, impactMaterial);
+            impactEffect.position.copy(position);
+            scene.add(impactEffect);
+            
+            // Trigger screen shake
+            shakeScreen(30, 700);
+        }
+
+        function shakeScreen(intensity, duration) {
+            isShaking = true;
+            shakeIntensity = intensity;
+            shakeDuration = duration;
+            shakeStartTime = Date.now();
+        }
+
 		window.addEventListener('resize', () => {
 			const newWidth = window.innerWidth;
 			const newHeight = window.innerHeight;
