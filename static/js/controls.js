@@ -11,7 +11,7 @@ $(window).on('DOMContentLoaded', () => {
     const energyDisplay = $('#info-energy-tnt');
     const radiusDisplay = $('#info-impact-radius');
 
-    // --- NOVAS REFERÊNCIAS PARA O PAINEL DE MITIGAÇÃO ---
+    // --- MITIGATION PANEL REFERENCES ---
     const mitigationBtn = $('#mitigation-toggle-btn');
     const mitigationInputs = $('#mitigation-inputs');
     const mitigationResults = $('#mitigation-results');
@@ -19,6 +19,7 @@ $(window).on('DOMContentLoaded', () => {
     const impactorMassValue = $('#impactor-mass-value');
     const impactorVelocitySlider = $('#impactor-velocity-slider');
     const impactorVelocityValue = $('#impactor-velocity-value');
+    const deltaVDisplay = $('#info-delta-v');
 
     // --- HELPER FUNCTIONS ---
     function formatScientificNotation(num) {
@@ -27,6 +28,32 @@ $(window).on('DOMContentLoaded', () => {
         const [base, exponent] = exponentialString.split('e');
         const cleanExponent = exponent.replace('+', '');
         return `${base} &times; 10<sup>${cleanExponent}</sup>`;
+    }
+
+    // --- NOVA FUNÇÃO PARA CALCULAR E MOSTRAR O DELTA-V ---
+    function calculateAndShowDeltaV() {
+        // Se o painel de mitigação não estiver visível, não faz nada
+        if (mitigationInputs.is(':hidden')) {
+            mitigationResults.slideUp();
+            return;
+        }
+
+        // 1. Pega a massa atual do asteroide do objeto 'asteroid'
+        const asteroidMass = asteroid.mass;
+
+        // 2. Pega os valores dos sliders do impactor
+        const impactorMass = parseFloat(impactorMassSlider.val());
+        const impactorVelocityKms = parseFloat(impactorVelocitySlider.val());
+        const impactorVelocityMs = impactorVelocityKms * 1000; // Converte para m/s
+
+        // 3. Calcula o delta-v
+        if (asteroidMass > 0) {
+            const deltaV = (impactorMass * impactorVelocityMs) / asteroidMass;
+            
+            // 4. Mostra o resultado na tela (em mm/s para ser mais legível)
+            deltaVDisplay.text(`${(deltaV * 1000).toFixed(4)} mm/s`);
+            mitigationResults.slideDown();
+        }
     }
 
     // --- CORE FUNCTIONS ---
@@ -38,16 +65,21 @@ $(window).on('DOMContentLoaded', () => {
         massValue.html(formatScientificNotation(asteroid.mass));
         diameterValue.text(`${asteroid.diameter.toFixed(2)} km`);
         velocityValue.text(`${asteroid.velocity.toFixed(1)} km/s`);
+        
         asteroid.calculateImpact();
+        
         energyDisplay.text(asteroid.energyKilotons.toLocaleString(undefined, { maximumFractionDigits: 0 }));
         radiusDisplay.text(asteroid.craterRadius.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+
+        // Sempre que o display principal atualizar, também tentamos atualizar o delta-v
+        calculateAndShowDeltaV();
     }
     asteroid.setUpdateDisplayFunc(updateDisplay);
 
     function initialize() {
-        asteroid.setMass(1.5e10); // Default mass
-        asteroid.setDiameter(0.4); // Default diameter
-        asteroid.setVelocity(12.6); // Default velocity
+        asteroid.setMass(1.5e10);
+        asteroid.setDiameter(0.4);
+        asteroid.setVelocity(12.6);
         asteroid.name = "Impact Simulator";
         updateDisplay();
     }
@@ -55,40 +87,37 @@ $(window).on('DOMContentLoaded', () => {
     // --- ASTEROID SLIDER LISTENERS ---
     massSlider.on('input', (event) => {
         const massExponent = parseFloat(event.target.value);
-        const newMass = Math.pow(10, massExponent);
-        asteroid.setMass(newMass);
+        asteroid.setMass(Math.pow(10, massExponent));
         updateDisplay();
     });
 
     diameterSlider.on('input', (event) => {
-        const newDiameterKm = parseFloat(event.target.value);
-        asteroid.setDiameter(newDiameterKm);
+        asteroid.setDiameter(parseFloat(event.target.value));
         updateDisplay();
     });
 
     velocitySlider.on('input', (event) => {
-        const newVelocity = parseFloat(event.target.value);
-        asteroid.setVelocity(newVelocity);
+        asteroid.setVelocity(parseFloat(event.target.value));
         updateDisplay();
     });
 
-    // --- NOVO CÓDIGO: MITIGATION PANEL LISTENERS ---
+    // --- MITIGATION PANEL LISTENERS ---
     mitigationBtn.on('click', () => {
-        mitigationInputs.slideToggle(); // Animação de mostrar/esconder com jQuery
-        // Se estivermos escondendo os inputs, também escondemos os resultados
-        if (mitigationInputs.is(':hidden')) {
-            mitigationResults.slideUp();
-        }
+        mitigationInputs.slideToggle(400, () => {
+            // Após a animação de mostrar/esconder, calcula o delta-v
+            calculateAndShowDeltaV();
+        });
     });
 
     impactorMassSlider.on('input', (event) => {
         impactorMassValue.text(`${event.target.value} kg`);
+        calculateAndShowDeltaV(); // Recalcula ao mudar a massa do impactor
     });
 
     impactorVelocitySlider.on('input', (event) => {
         impactorVelocityValue.text(`${parseFloat(event.target.value).toFixed(1)} km/s`);
+        calculateAndShowDeltaV(); // Recalcula ao mudar a velocidade do impactor
     });
-
 
     // --- START THE APP ---
     initialize();
