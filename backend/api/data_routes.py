@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from data_services.nasa_client import get_asteroids_for_date_range, get_asteroid_data
 from datetime import date, timedelta
 from simulation.cratering import crater_diameter, crater_depth, crater_area
-from simulation.effects import calculate_seismic_effect
+from simulation.effects import calculate_seismic_effect,find_radius_for_overpressure
 from simulation.energetics import calculate_impact_energy
 
 # O nome aqui deve ser único
@@ -70,6 +70,7 @@ def get_cratering_results():
         depth = crater_depth(asteroid_id)
         area = crater_area(asteroid_id)
         seismic_effect = calculate_seismic_effect(energy_results['kinetic_energy_joules'])
+        air_blast = find_radius_for_overpressure(energy_results['energy_megatons_tnt'], 4.0)
 
         # 4. Compila os resultados
         if diameter is None or depth is None or area is None:
@@ -80,7 +81,8 @@ def get_cratering_results():
                     "diameter": diameter,
                     "depth": depth,
                     "area": area,
-                    "seismic_effect": seismic_effect
+                    "seismic_effect": seismic_effect,
+                    "air_blast": air_blast
                 }
             }), 404 # 404 Not Found se o asteroide não for encontrado/dados indisponíveis
 
@@ -101,6 +103,10 @@ def get_cratering_results():
             "seismic_effect": {
                 "value": seismic_effect,
                 "unit": "joules"
+            },
+            "air_blast": {
+                "value": air_blast,
+                "unit": "metros"
             }
         }
 
