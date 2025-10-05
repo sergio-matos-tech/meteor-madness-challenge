@@ -1,11 +1,20 @@
 
 from flask import Blueprint, jsonify, request
-from data_services.nasa_client import get_asteroids_for_date_range
+from data_services.nasa_client import get_asteroids_for_date_range, get_asteroids_names
 from datetime import date, timedelta
 from simulation.cratering import crater_diameter, crater_depth, crater_area
 
 # O nome aqui deve ser único
 data_bp = Blueprint('data_bp', __name__)
+
+@data_bp.route('/asteroids/names', methods=['GET'])
+def list_asteroids_names():
+    asteroids_data = get_asteroids_names()
+
+    if not asteroids_data:
+        return jsonify({"error": "Could not retrieve asteroid list from NASA"}), 500
+
+    return jsonify(asteroids_data)
 
 @data_bp.route('/asteroids', methods=['GET'])
 def list_upcoming_asteroids():

@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from datetime import date
 
 import requests
 from config import NASA_API_KEY
@@ -50,6 +51,36 @@ def get_asteroids_for_date_range(start_date: str, end_date: str) -> dict:
     except requests.exceptions.RequestException as e:
         print(f"Erro ao buscar lista de asteroides: {e}")
         return None
+
+
+
+def get_asteroids_names() -> dict:
+    BROWSE_URL = "https://api.nasa.gov/neo/rest/v1/neo/browse"
+    
+    today = date.today()
+    start_date = "2025-05-01"
+    end_date = today.strftime("%Y-%m-%d")
+
+    params = {
+        "api_key": NASA_API_KEY
+    }
+
+    try:
+        response = requests.get(BROWSE_URL, params=params)
+        response.raise_for_status()
+        print("Lista recebida com sucesso!")
+        asteroids = response.json()
+
+        names = []
+
+        for asteroid in asteroids["near_earth_objects"]:
+            names.append({ "id": asteroid["id"], "name": asteroid["name"] })        
+        
+        return names
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar lista de asteroides: {e}")
+        return None
+    
 
 # Standalone test block for this module
 if __name__ == "__main__":

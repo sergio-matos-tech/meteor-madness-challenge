@@ -2,10 +2,13 @@
 
 from flask import Flask
 from flasgger import Swagger
+from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)
     swagger = Swagger(app)
+
+    CORS(app)
 
     # Importa e registra o Blueprint de SIMULAÇÃO (apenas uma vez)
     from api.simulation_routes import sim_bp
