@@ -34,20 +34,26 @@ function getOptions(query) {
 function showOptions(query) {
     optionsContainer.empty()
 
-    getOptions(query).forEach(opt => {
-        optionsContainer.append(createOptionElement(opt))
-    });
+    const options = getOptions(query)
+
+    
+    if (options.length) {
+        options.forEach(opt => optionsContainer.append(createOptionElement(opt)))
+    } else {
+        const msg = $("<li>")
+            .text("Ops... nenhum asteroid com esse nome encontrado")
+            .addClass("option")
+
+        optionsContainer.append(msg)
+    }
 }
 
 function createOptionElement({ id, label }) {
     return $("<li>")
         .text(label)
-        .addClass("option")
-        .on("click", () => searchAsteroid(id))
-}
-
-function searchAsteroid(id) {
-    optionsContainer.hide()
-
-    // TODO: Busca na api
+        .addClass("option valid")
+        .on("click", () => {
+            optionsContainer.hide()
+            asteroid.set(id)
+        })
 }

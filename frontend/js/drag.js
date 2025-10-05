@@ -27,7 +27,7 @@ $(document).on("mouseup", () => {
     if (dragging) {
         resetAsteroidPosition()
         dragging = false
-        throwAsteroid(mouseCoordinates)
+        asteroid.throw(mouseCoordinates)
     }
 })
 
