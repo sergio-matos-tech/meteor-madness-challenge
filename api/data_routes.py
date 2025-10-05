@@ -143,7 +143,7 @@ def get_asteroid_by_id():
     velocity_kms = energy_results['velocity_ms']/1000
     mass = energy_results['mass_kg']
 
-    if not name or not is_hazardous or not diameter_min or not diameter_max or not mass:
+    if name is None or is_hazardous is None or diameter_min is None or diameter_max is None or mass is None:
         return jsonify({"error": "Could not retrieve asteroid list from NASA"}), 500
 
     results = {

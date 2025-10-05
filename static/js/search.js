@@ -74,6 +74,8 @@ function createOptionElement({ id, name }) {
             }).appendTo("body")
 
             asteroid.load(id, () => loadingOverlay.remove())
+
+            searchBar.val("")
         })
 }
 
