@@ -4,6 +4,7 @@ from data_services.nasa_client import get_asteroids_for_date_range, get_asteroid
 from datetime import date, timedelta
 from simulation.cratering import crater_diameter, crater_depth, crater_area
 from simulation.effects import calculate_seismic_effect
+from simulation.energetics import calculate_impact_energy
 
 # O nome aqui deve ser único
 data_bp = Blueprint('data_bp', __name__)
