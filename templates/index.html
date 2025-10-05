@@ -6,13 +6,14 @@
 
     <title>Meteor Madness</title>
 
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
     <link
         rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""
     />
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     
 </head>
@@ -74,19 +75,19 @@
     <!-- ---------- Scripts ---------- -->
 
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
-    <script src="js/jquery.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
 
     <!-- Asteroid -->
-    <script src="js/asteroid.js"></script>
+    <script src="{{ url_for('static', filename='js/asteroid.js') }}"></script>
 
     <!-- Controls -->
-    <script src="js/controls.js"></script>
+    <script src="{{ url_for('static', filename='js/controls.js') }}"></script>
 
     <!-- Drag and drop -->
-    <script src="js/drag.js"></script>
+    <script src="{{ url_for('static', filename='js/drag.js') }}"></script>
 
     <!-- Search Bar -->
-    <script src="js/search.js"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 
     <!-- Map -->
     <script
@@ -94,7 +95,7 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin="">
     </script>
-    <script src="js/map.js"></script>    
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>    
     
     <script>
         // Simple preview rendering (meteor and earth)
@@ -128,7 +129,7 @@
         }
         // Button event to go to 3D page
         document.getElementById('view-3d-btn').onclick = function() {
-            window.location.href = '3d.html';
+            window.location.href = '3d';
         };
     </script>
 </body>

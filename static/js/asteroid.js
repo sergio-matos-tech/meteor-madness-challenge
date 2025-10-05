@@ -29,7 +29,7 @@ const asteroid = {
 
     async load(id, onLoad = null) {
         $.ajax({
-            url: `http://localhost:5000/api/v1/cratering/results?asteroid_id=${id}`,
+            url: `/api/v1/cratering/results?asteroid_id=${id}`,
             type: "GET",
             dataType: "json",
             success: (response) => console.log(response),

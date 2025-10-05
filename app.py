@@ -1,6 +1,6 @@
 # backend/app.py
 
-from flask import Flask
+from flask import Flask, render_template
 from flasgger import Swagger
 from flask_cors import CORS
 
@@ -20,7 +20,11 @@ def create_app():
 
     @app.route("/")
     def index():
-        return "Servidor da API Impactor-2025 está no ar!"
+        return render_template("index.html")
+    
+    @app.route("/3d")
+    def _3d():
+        return render_template("3d.html")
 
     return app
 

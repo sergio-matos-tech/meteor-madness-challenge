@@ -83,7 +83,7 @@ async function getAsteroidList() {
     return new Promise((resolve, reject) => {
         $.ajax({
             // TODO: Colocar url em .env
-            url: "http://localhost:5000/api/v1/asteroids/names",
+            url: "/api/v1/asteroids/names",
             dataType: "json",
             type: "GET",
             success: resolve,
