@@ -43,7 +43,7 @@ $(window).on('DOMContentLoaded', () => {
     function initialize() {
         asteroid.setMass(1.5e10) // Default mass
         asteroid.setDiameter(0.4) // Default diameter
-        asteroid.setVelocity(12.6) // Default velocity
+        asteroid.setVelocity(5.6) // Default velocity
 
         asteroid.name = "Lobotomy Asteroid"
 

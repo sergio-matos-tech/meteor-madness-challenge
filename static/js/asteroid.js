@@ -47,7 +47,7 @@ const asteroid = {
             success: response => {
                 console.log(response)
                 this.name = response.name
-                this.diameter = (response.diameter_max + response.diameter_min) / 2
+                this.diameter = (response.diameter_max + response.diameter_min) / 2000
                 this.velocity = response.velocity_kms
                 this.mass = response.mass
                 
