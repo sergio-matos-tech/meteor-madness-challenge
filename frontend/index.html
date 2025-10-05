@@ -7,22 +7,31 @@
     <title>Meteor Madness</title>
 
     <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+    <link
+        rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    
 </head>
 <body>
-    <div class="search-container">
-        <input class="over-map search form-control mt-3" type="text">
-    </div>
 
-    <div class="card over-map info m-3 bg-dark text-light">
+    <div class="search-container over-map">
+        <input id="search" class="form-control mt-3" type="text">
+        <ul id="options-container" class="card"></ul>
+    </div>
+    
+    <div class="card over-map info m-3 bg-dark text-light controls-container">
+        <div id="asteroid" class="over-map"></div>
+
         <div class="card-body">
             <h5 class="card-title border-bottom pb-2"><i class="fas fa-sliders-h"></i> Impact Simulator</h5>
             
             <div class="slider-control">
                 <label for="mass-slider" class="form-label"><i class="fas fa-weight-hanging fa-fw"></i> Mass</label>
-                <input type="range" class="form-range" id="mass-slider" min="9" max="14" step="0.05">
+                <input type="range" class="form-range" id="mass-slider" min="9" max="15" step="0.05">
                 <span class="slider-value" id="mass-value">N/A</span>
             </div>
             <div class="slider-control">
@@ -32,7 +41,7 @@
             </div>
             <div class="slider-control">
                 <label for="velocity-slider" class="form-label"><i class="fas fa-tachometer-alt fa-fw"></i> Velocity</label>
-                <input type="range" class="form-range" id="velocity-slider" min="5" max="40" step="0.1">
+                <input type="range" class="form-range" id="velocity-slider" min="5" max="100" step="0.1">
                 <span class="slider-value" id="velocity-value">N/A</span>
             </div>
             
@@ -51,13 +60,32 @@
     
     <div id="map"></div>
 
-    <script src="js/jquery.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
-    <script>
-        const map = L.map('map').setView([0, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    <!-- ---------- Scripts ---------- -->
+
+    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+   <script src="js/jquery.js"></script>
+
+    <!-- Asteroid -->
+    <script src="js/asteroid.js"></script>
+
+    <!-- Controls -->
+    <script src="js/controls.js"></script>
+
+    <!-- Drag and drop -->
+    <script src="js/drag.js"></script>
+
+    <!-- Search Bar -->
+    <script src="js/search.js"></script>
+
+    <!-- Map -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
     </script>
-    <script src="js/main.js"></script>
-</body>a
+    <script src="js/map.js"></script>    
+
+</body>
 </html>
+
