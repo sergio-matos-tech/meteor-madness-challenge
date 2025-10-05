@@ -3,47 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Meteor Madness</title>
-    <!-- Correct path to the CSS file -->
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 </head>
 <body>
+    <div class="search-container">
+        <input class="over-map search form-control mt-3" type="text">
+    </div>
 
-    <header class="main-header">
-        <h1>Meteor Madness Simulation</h1>
-    </header>
-
-    <main class="container">
-        <div class="controls-and-info">
-            <div id="controls" class="card">
-                <h2>Controls</h2>
-                <label for="asteroid-select">Select Asteroid:</label>
-                <select id="asteroid-select">
-                    <option value="">--Please choose an asteroid--</option>
-                </select>
+    <div class="card over-map info m-3 bg-dark text-light">
+        <div class="card-body">
+            <h5 class="card-title border-bottom pb-2"><i class="fas fa-sliders-h"></i> Impact Simulator</h5>
+            
+            <div class="slider-control">
+                <label for="mass-slider" class="form-label"><i class="fas fa-weight-hanging fa-fw"></i> Mass</label>
+                <input type="range" class="form-range" id="mass-slider" min="9" max="14" step="0.05">
+                <span class="slider-value" id="mass-value">N/A</span>
             </div>
-
-            <div id="info-panel" class="card">
-                <h2>Asteroid Details</h2>
-                <p><strong>Name:</strong> <span id="info-name">N/A</span></p>
-                <p><strong>Max Diameter (km):</strong> <span id="info-diameter">N/A</span></p>
-                <p><strong>Velocity (km/s):</strong> <span id="info-velocity">N/A</span></p>
+            <div class="slider-control">
+                <label for="diameter-slider" class="form-label"><i class="fas fa-arrows-alt-h fa-fw"></i> Diameter</label>
+                <input type="range" class="form-range" id="diameter-slider" min="0.1" max="3.0" step="0.01">
+                <span class="slider-value" id="diameter-value">N/A</span>
+            </div>
+            <div class="slider-control">
+                <label for="velocity-slider" class="form-label"><i class="fas fa-tachometer-alt fa-fw"></i> Velocity</label>
+                <input type="range" class="form-range" id="velocity-slider" min="5" max="40" step="0.1">
+                <span class="slider-value" id="velocity-value">N/A</span>
+            </div>
+            
+            <div class="results-panel mt-3 pt-3 border-top">
+                <div class="result-item">
+                    <h6><i class="fas fa-bomb"></i> Impact Energy (kt)</h6>
+                    <span id="info-energy-tnt" class="result-value">N/A</span>
+                </div>
+                <div class="result-item">
+                    <h6><i class="fas fa-circle"></i> Crater Radius (km)</h6>
+                    <span id="info-impact-radius" class="result-value">N/A</span>
+                </div>
             </div>
         </div>
+    </div>
+    
+    <div id="map"></div>
 
-        <div id="visualization-container" class="card">
-            <!-- *** FIX APPLIED HERE: Added class="viz-panel" *** -->
-            <div id="map-2d" class="viz-panel"></div>
-            <div id="scene-3d" class="viz-panel"></div>
-        </div>
-    </main>
-
-    <!-- External libraries -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <!-- Correct path to the JavaScript file -->
+    <script src="js/jquery.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    
+    <script>
+        const map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    </script>
     <script src="js/main.js"></script>
-</body>
+</body>a
 </html>
-
