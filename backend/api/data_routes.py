@@ -120,3 +120,31 @@ def get_cratering_results():
             "error": "Erro interno do servidor ao processar a solicitação.",
             "details": str(e)
         }), 500 # 500 Internal Server Error
+
+@data_bp.route('/asteroid', methods=['GET'])
+def get_asteroid_by_id():
+    asteroid_id = request.args.get('asteroid_id')
+    asteroids_data = get_asteroid_data(asteroid_id)
+    energy_results = calculate_impact_energy(asteroids_data)
+
+    name = asteroids_data.get("name")
+    is_hazardous = asteroids_data.get("is_potentially_hazardous_asteroid")
+    diameter_min = asteroids_data.get("estimated_diameter", {}).get("meters", {}).get("estimated_diameter_min")
+    diameter_max = asteroids_data.get("estimated_diameter", {}).get("meters", {}).get("estimated_diameter_max")
+    velocity_kms = energy_results['velocity_ms']/1000
+    mass = energy_results['mass_kg']
+
+    if not name or not is_hazardous or not diameter_min or not diameter_max or not mass:
+        return jsonify({"error": "Could not retrieve asteroid list from NASA"}), 500
+
+    results = {
+        "asteroid_id": asteroid_id,
+        "name": name,
+        "is_hazardous": is_hazardous,
+        "diameter_min": diameter_min,
+        "diameter_max": diameter_max,
+        "velocity_kms": velocity_kms,
+        "mass": mass
+    }
+
+    return jsonify(results), 200
