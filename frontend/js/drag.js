@@ -15,20 +15,20 @@ dragableAsteroid.on("mousedown", (e) => {
 })
 
 $(document).on("mousemove", (e) => {
-    if (dragging) {
-        dragableAsteroid.css({
-            left: e.clientX - offsetX,
-            top: e.clientY - offsetY
-        })
-    }
+    if (!dragging) return
+
+    dragableAsteroid.css({
+        left: e.clientX - offsetX,
+        top: e.clientY - offsetY
+    })
 })
 
 $(document).on("mouseup", () => {
-    if (dragging) {
-        resetAsteroidPosition()
-        dragging = false
-        asteroid.throw(mouseCoordinates)
-    }
+    if (!dragging) return
+
+    resetAsteroidPosition()
+    dragging = false
+    asteroid.throw(mouseCoordinates)
 })
 
 function resetAsteroidPosition() {

@@ -54,6 +54,6 @@ function createOptionElement({ id, label }) {
         .addClass("option valid")
         .on("click", () => {
             optionsContainer.hide()
-            asteroid.set(id)
+            asteroid.load(id)
         })
 }
