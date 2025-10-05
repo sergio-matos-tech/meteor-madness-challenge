@@ -4,11 +4,14 @@ const searchBar = $("#search")
 // Puxa lista de asteroids da api
 let asteroidList = []
 getAsteroidList().then(asteroids => {
-    const exempleAsteroids = asteroids.slice(0, 3).map(a => a.name).join(", ")
+    asteroidList = [
+        { id: "chicxulub", name: "Chicxulub Impactor (Dinosaur Killer)" },
+        ...asteroids
+    ]
+    
+    const exempleAsteroids = asteroidList.slice(0, 3).map(a => a.name).join(", ")
     searchBar.attr("placeholder", `Ex: ${exempleAsteroids} ...`);
-
-    asteroidList = asteroids
-
+    
     showOptions(searchBar.val())
 })
 

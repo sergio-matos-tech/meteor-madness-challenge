@@ -47,7 +47,32 @@ const asteroid = {
         this.overpressureRaius = findOverpressureRadius(this.energyKilotons, 4.0)
     },
 
-    async load(id, onLoad = null) {
+    load(id, onLoad = null) {
+        if (id == "chicxulub") {
+            const response = {
+                asteroid_id: "chicxulub",
+                diameter_max: 15000.0,
+                diameter_min: 10000.0,
+                is_hazardous: false,
+                mass: 3e15,
+                name: "Chicxulub Impactor",
+                velocity_kms: 20
+            }
+
+            this.name = response.name
+            this.diameter = (response.diameter_max + response.diameter_min) / 2000
+
+            this.velocity = response.velocity_kms
+            this.mass = response.mass
+            
+            this.calculateImpact()
+
+            this.updateDisplayFunc?.()
+            onLoad?.()
+
+            return
+        }
+
         $.ajax({
             url: `/api/v1/asteroid?asteroid_id=${id}`,
             type: "GET",
