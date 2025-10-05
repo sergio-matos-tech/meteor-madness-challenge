@@ -46,7 +46,7 @@ function showOptions(query) {
         options.forEach(opt => optionsContainer.append(createOptionElement(opt)))
     } else {
         const msg = $("<li>")
-            .text("Ops... nenhum asteroid com esse nome encontrado")
+            .text("Ops... no asteroid with that name found")
             .addClass("option")
 
         optionsContainer.append(msg)
@@ -70,7 +70,7 @@ function createOptionElement({ id, name }) {
                 width: "100vh",
                 height: "100vh",
                 cursor: "wait",
-                zIndex: 99990
+                zIndex: 99999
             }).appendTo("body")
 
             asteroid.load(id, () => loadingOverlay.remove())

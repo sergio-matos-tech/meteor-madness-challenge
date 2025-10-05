@@ -31,7 +31,7 @@ const asteroid = {
 
     calculateImpact() {
         const kineticEnergyJoules = 0.5 * this.mass * Math.pow(this.velocity * 1000, 2);
-        const JOULES_PER_KILOTON = 4.184e15;
+        const JOULES_PER_KILOTON = 4.184e12;
         
         this.energyKilotons = kineticEnergyJoules / JOULES_PER_KILOTON;
         this.craterRadius = 1.8 * Math.pow(this.energyKilotons / 1000, 1/3.4) * 1000 / 2;
@@ -66,8 +66,8 @@ const asteroid = {
 
         const outer = L.circle([lat, lng], {
             radius: 0,
-            color: "#f5b042",
-            fillColor: "#f5b042",
+            color: "#f2cb2c",
+            fillColor: "#f2cb2c",
             fillOpacity: 0.5
         }).addTo(map)
 
@@ -99,28 +99,20 @@ const asteroid = {
 }
 
 function shake(intensity, duration) {
-    const el = $("#map")
-    
+    const el = $("#map")    
     const start = performance.now();
-    const backupStyle = {
-        left: el.css("left") || 0,
-        top: el.css("top") || 0
-    };
 
     function animate(time) {
         const elapsed = time - start;
         if (elapsed >= duration) {
-            el.css(backupStyle);
+            el.css({ left: 0, top: 0 });
             return;
         }
 
         const dx = (Math.random() * 2 - 1) * intensity;
         const dy = (Math.random() * 2 - 1) * intensity;
 
-        el.css({
-            left: `calc(${backupStyle.left} + ${dx}px)`,
-            top: `calc(${backupStyle.top} + ${dy}px)`
-        });
+        el.css({ left: dx, top: dy });
 
         requestAnimationFrame(animate);
     }
