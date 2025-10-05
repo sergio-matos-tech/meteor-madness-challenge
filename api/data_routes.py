@@ -1,8 +1,10 @@
 
 from flask import Blueprint, jsonify, request
-from data_services.nasa_client import get_asteroids_for_date_range, get_asteroids_names
+from data_services.nasa_client import get_asteroids_for_date_range, get_asteroid_data, get_asteroids_names
 from datetime import date, timedelta
 from simulation.cratering import crater_diameter, crater_depth, crater_area
+from simulation.effects import calculate_seismic_effect,find_radius_for_overpressure
+from simulation.energetics import calculate_impact_energy
 
 # O nome aqui deve ser único
 data_bp = Blueprint('data_bp', __name__)
@@ -49,21 +51,25 @@ def list_upcoming_asteroids():
 
     return jsonify(asteroids_data)
 
-@data_bp.route('/cratering/results', methods=['GET'])
+@data_bp.route('/effects/results', methods=['GET'])
 def get_cratering_results():
     """
     Endpoint para obter todos os resultados de cratering para um dado ID de asteroide.
-    Exemplo de uso: /cratering/results?asteroid_id=3542519
+    Exemplo de uso: /effects/results?asteroid_id=3542519
     """
 
     # 1. Pega o parâmetro 'asteroid_id' da URL
     asteroid_id = request.args.get('asteroid_id')
 
+    # Pega os dados de acordo com ID do meteoro
+    data = get_asteroid_data(asteroid_id)
+    energy_results = calculate_impact_energy(data)
+
     # 2. Verifica se o ID foi fornecido
     if not asteroid_id:
         return jsonify({
             "error": "Parâmetro 'asteroid_id' é obrigatório.",
-            "exemplo": "/cratering/results?asteroid_id=SEU_ID_DO_ASTEROIDE"
+            "exemplo": "/effects/results?asteroid_id=SEU_ID_DO_ASTEROIDE"
         }), 400  # 400 Bad Request
 
     # 3. Executa as funções
@@ -72,6 +78,8 @@ def get_cratering_results():
         diameter = crater_diameter(asteroid_id)
         depth = crater_depth(asteroid_id)
         area = crater_area(asteroid_id)
+        seismic_effect = calculate_seismic_effect(energy_results['kinetic_energy_joules'])
+        air_blast = find_radius_for_overpressure(energy_results['energy_megatons_tnt'], 4.0)
 
         # 4. Compila os resultados
         if diameter is None or depth is None or area is None:
@@ -81,7 +89,9 @@ def get_cratering_results():
                 "detalhes": {
                     "diameter": diameter,
                     "depth": depth,
-                    "area": area
+                    "area": area,
+                    "seismic_effect": seismic_effect,
+                    "air_blast": air_blast
                 }
             }), 404 # 404 Not Found se o asteroide não for encontrado/dados indisponíveis
 
@@ -98,6 +108,14 @@ def get_cratering_results():
             "crater_area": {
                 "value": area,
                 "unit": "metros^2"
+            },
+            "seismic_effect": {
+                "value": seismic_effect,
+                "unit": "joules"
+            },
+            "air_blast": {
+                "value": air_blast,
+                "unit": "metros"
             }
         }
 
@@ -111,3 +129,31 @@ def get_cratering_results():
             "error": "Erro interno do servidor ao processar a solicitação.",
             "details": str(e)
         }), 500 # 500 Internal Server Error
+
+@data_bp.route('/asteroid', methods=['GET'])
+def get_asteroid_by_id():
+    asteroid_id = request.args.get('asteroid_id')
+    asteroids_data = get_asteroid_data(asteroid_id)
+    energy_results = calculate_impact_energy(asteroids_data)
+
+    name = asteroids_data.get("name")
+    is_hazardous = asteroids_data.get("is_potentially_hazardous_asteroid")
+    diameter_min = asteroids_data.get("estimated_diameter", {}).get("meters", {}).get("estimated_diameter_min")
+    diameter_max = asteroids_data.get("estimated_diameter", {}).get("meters", {}).get("estimated_diameter_max")
+    velocity_kms = energy_results['velocity_ms']/1000
+    mass = energy_results['mass_kg']
+
+    if not name or not is_hazardous or not diameter_min or not diameter_max or not mass:
+        return jsonify({"error": "Could not retrieve asteroid list from NASA"}), 500
+
+    results = {
+        "asteroid_id": asteroid_id,
+        "name": name,
+        "is_hazardous": is_hazardous,
+        "diameter_min": diameter_min,
+        "diameter_max": diameter_max,
+        "velocity_kms": velocity_kms,
+        "mass": mass
+    }
+
+    return jsonify(results), 200
