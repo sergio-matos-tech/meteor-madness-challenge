@@ -3,15 +3,15 @@ let offsetX, offsetY, dragging = false
 let asteroidDefaultPosition = { left: null, top: null }
 
 dragableAsteroid.on("mousedown", (e) => {
-    dragging = true
-
     const pos = dragableAsteroid.position()
 
-    asteroidDefaultPosition.left = pos.left
-    asteroidDefaultPosition.top = pos.top
-    
+    asteroidDefaultPosition.left = dragableAsteroid.css("left")
+    asteroidDefaultPosition.top = dragableAsteroid.css("top")
+        
     offsetX = e.clientX - pos.left
     offsetY = e.clientY - pos.top
+    
+    dragging = true
 })
 
 $(document).on("mousemove", (e) => {
