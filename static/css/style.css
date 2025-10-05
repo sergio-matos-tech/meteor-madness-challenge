@@ -115,19 +115,19 @@
 }
 
 #asteroid {
-    width: 30px;
-    height: 30px;
-    background: dodgerblue;
+    width: 35px;
+    height: 35px;
     position: absolute;
     cursor: grab;
     border-radius: 50%;
     bottom: 10px;
     right: 10px;
+    /* background-color: white; */
     transition: transform 0.15s ease;
 }
 
 #asteroid:hover {
-    transform: scale(1.1);
+    transform: scale(1.2);
 }
 
 body {
