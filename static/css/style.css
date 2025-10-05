@@ -137,3 +137,11 @@ body {
 .controls-container {
     max-width: 400px;
 }
+
+.preview-box {
+    max-width: 300px;
+}
+
+#preview-canvas {
+    max-height: 120px;
+}
