@@ -5,6 +5,7 @@ from datetime import date
 
 import requests
 from config import NASA_API_KEY
+import json
 
 BASE_URL = "https://api.nasa.gov/neo/rest/v1/neo/{asteroid_id}"
 
@@ -86,7 +87,8 @@ def get_asteroids_names() -> dict:
 if __name__ == "__main__":
     # Apophis ID, used as an example
     test_asteroid_id = "3542519"
-    data = get_asteroids_for_date_range("2015-09-07", "2015-09-08")
+    #data = get_asteroids_for_date_range("2015-09-07", "2015-09-08")
+    data = get_asteroid_data(test_asteroid_id)
     print(data)
 
     # if data:

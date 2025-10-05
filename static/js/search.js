@@ -5,7 +5,7 @@ const searchBar = $("#search")
 let asteroidList = []
 getAsteroidList().then(asteroids => {
     const exempleAsteroids = asteroids.slice(0, 3).map(a => a.name).join(", ")
-    searchBar.attr("placeholder", `Ex: ${exempleAsteroids}...`);
+    searchBar.attr("placeholder", `Ex: ${exempleAsteroids} ...`);
 
     asteroidList = asteroids
 
@@ -74,6 +74,8 @@ function createOptionElement({ id, name }) {
             }).appendTo("body")
 
             asteroid.load(id, () => loadingOverlay.remove())
+
+            searchBar.val("")
         })
 }
 

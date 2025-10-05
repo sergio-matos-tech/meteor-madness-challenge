@@ -1,10 +1,17 @@
 const asteroid = {
+    name: "",
     mass: null,
     diameter: null,
     velocity: null,
 
     energyKilotons: null,
     craterRadius: null,
+
+    updateDisplayFunc: null,
+
+    setUpdateDisplayFunc(func) {
+        this.updateDisplayFunc = func
+    },
 
     setMass(mass) {
         this.mass = mass
@@ -29,10 +36,20 @@ const asteroid = {
 
     async load(id, onLoad = null) {
         $.ajax({
-            url: `/api/v1/cratering/results?asteroid_id=${id}`,
+            url: `/api/v1/asteroid?asteroid_id=${id}`,
             type: "GET",
             dataType: "json",
-            success: (response) => console.log(response),
+            success: response => {
+                console.log(response)
+                this.name = response.name
+                this.diameter = (response.diameter_max + response.diameter_min) / 2
+                this.velocity = response.velocity_kms
+                this.mass = response.mass
+                
+                this.calculateImpact()
+
+                this.updateDisplayFunc()
+            },
             error: (xhr, status, error) => console.error(status, error),
             complete: () => onLoad?.()
         });
