@@ -1,8 +1,10 @@
-# Meteor Madness
+# Website Link: https://meteor-madness-challenge.onrender.com/
+
+## Meteor Madness
 
 Made as part of [NASA Space Apps Challenge 2025](https://www.spaceappschallenge.org/2025/challenges/meteor-madness)
 
-## The Problem
+### The Problem
 
 The discovery of near-Earth asteroids highlights the ongoing risk of celestial objects colliding with our planet. Asteroid impacts, though rare, could cause widespread devastation, including tsunamis, seismic events, and atmospheric changes.
 NASA and the U.S. Geological Survey (USGS) provide vast datasets on asteroids and Earth's geology, but this information is not well-integrated, making it difficult to model impact scenarios, predict the consequences, and evaluate strategies to mitigate the risks.
