@@ -4,6 +4,8 @@ const asteroid = {
     diameter: null,
     velocity: null,
 
+    mitigatedVelocity: null,
+
     energyKilotons: null,
     craterRadius: null,
     overpressureRaius: null,
@@ -29,8 +31,14 @@ const asteroid = {
         this.calculateImpact()
     },
 
+    setMitigatedVelocity(velocity) {
+        this.mitigatedVelocity = velocity
+        this.calculateImpact()
+    },
+
     calculateImpact() {
-        const kineticEnergyJoules = 0.5 * this.mass * Math.pow(this.velocity * 1000, 2);
+        const totalVelocity = Math.max(0, this.velocity - this.mitigatedVelocity)
+        const kineticEnergyJoules = 0.5 * this.mass * Math.pow(totalVelocity * 1000, 2);
         const JOULES_PER_KILOTON = 4.184e12;
         
         this.energyKilotons = kineticEnergyJoules / JOULES_PER_KILOTON;
@@ -53,7 +61,7 @@ const asteroid = {
                 
                 this.calculateImpact()
 
-                this.updateDisplayFunc()
+                this.updateDisplayFunc?.()
             },
             error: (xhr, status, error) => console.error(status, error),
             complete: () => onLoad?.()

@@ -42,22 +42,29 @@ $(window).on('DOMContentLoaded', () => {
         const asteroidMass = asteroid.mass;
 
         // 2. Pega os valores dos sliders do impactor
-        const impactorMass = parseFloat(impactorMassSlider.val());
+        const impactorMass = Math.pow(10, parseFloat(impactorMassSlider.val()));
         const impactorVelocityKms = parseFloat(impactorVelocitySlider.val());
         const impactorVelocityMs = impactorVelocityKms * 1000; // Converte para m/s
 
         // 3. Calcula o delta-v
         if (asteroidMass > 0) {
-            const deltaV = (impactorMass * impactorVelocityMs) / asteroidMass;
+            const deltaV = (impactorMass * impactorVelocityMs) / (asteroidMass * 1000);
             
             // 4. Mostra o resultado na tela (em mm/s para ser mais legível)
-            deltaVDisplay.text(`${(deltaV * 1000).toFixed(4)} mm/s`);
+            deltaVDisplay.text(`-${deltaV.toFixed(4)} km/s`);
             mitigationResults.slideDown();
+
+            asteroid.setMitigatedVelocity(deltaV)
         }
     }
 
     // --- CORE FUNCTIONS ---
     function updateDisplay() {
+        // Sempre que o display principal atualizar, também tentamos atualizar o delta-v
+        calculateAndShowDeltaV();
+
+        asteroid.calculateImpact()
+
         massSlider.val(Math.log10(asteroid.mass));
         diameterSlider.val(asteroid.diameter);
         velocitySlider.val(asteroid.velocity);
@@ -65,14 +72,9 @@ $(window).on('DOMContentLoaded', () => {
         massValue.html(formatScientificNotation(asteroid.mass));
         diameterValue.text(`${asteroid.diameter.toFixed(2)} km`);
         velocityValue.text(`${asteroid.velocity.toFixed(1)} km/s`);
-        
-        asteroid.calculateImpact();
-        
+                
         energyDisplay.text(asteroid.energyKilotons.toLocaleString(undefined, { maximumFractionDigits: 0 }));
         radiusDisplay.text(asteroid.craterRadius.toLocaleString(undefined, { maximumFractionDigits: 2 }));
-
-        // Sempre que o display principal atualizar, também tentamos atualizar o delta-v
-        calculateAndShowDeltaV();
     }
     asteroid.setUpdateDisplayFunc(updateDisplay);
 
@@ -82,7 +84,7 @@ $(window).on('DOMContentLoaded', () => {
         asteroid.setVelocity(5.6) // Default velocity
 
         asteroid.name = "Lobotomy Asteroid"
-
+        
         updateDisplay()
     }
 
@@ -107,18 +109,26 @@ $(window).on('DOMContentLoaded', () => {
     mitigationBtn.on('click', () => {
         mitigationInputs.slideToggle(400, () => {
             // Após a animação de mostrar/esconder, calcula o delta-v
-            calculateAndShowDeltaV();
+            updateDisplay();
         });
+
+        impactorMassSlider.val(9)
+        impactorMassSlider.trigger("input")
+
+        impactorVelocitySlider.val(1)
+        impactorVelocitySlider.trigger("input")
     });
 
     impactorMassSlider.on('input', (event) => {
-        impactorMassValue.text(`${event.target.value} kg`);
-        calculateAndShowDeltaV(); // Recalcula ao mudar a massa do impactor
+        const massExponent = parseFloat(event.target.value)
+        const massValue = Math.pow(10, massExponent)
+        impactorMassValue.html(formatScientificNotation(massValue))
+        updateDisplay() // Recalcula ao mudar a massa do impactor
     });
 
     impactorVelocitySlider.on('input', (event) => {
         impactorVelocityValue.text(`${parseFloat(event.target.value).toFixed(1)} km/s`);
-        calculateAndShowDeltaV(); // Recalcula ao mudar a velocidade do impactor
+        updateDisplay() // Recalcula ao mudar a velocidade do impactor
     });
 
     // --- START THE APP ---
