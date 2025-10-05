@@ -1,179 +1,93 @@
-// Wait for the entire HTML document to be fully loaded and parsed.
-// This prevents "race condition" errors where the script tries to find
-// an element that hasn't been created yet.
 window.addEventListener('DOMContentLoaded', () => {
 
-    // =================================================================
-    // DOM ELEMENT REFERENCES
-    // =================================================================
-    const asteroidSelect = document.getElementById('asteroid-select');
-    const infoName = document.getElementById('info-name');
-    const infoDiameter = document.getElementById('info-diameter');
-    const infoVelocity = document.getElementById('info-velocity');
+    // --- DOM ELEMENT REFERENCES ---
+    const massSlider = document.getElementById('mass-slider');
+    const diameterSlider = document.getElementById('diameter-slider');
+    const velocitySlider = document.getElementById('velocity-slider');
+    const massValue = document.getElementById('mass-value');
+    const diameterValue = document.getElementById('diameter-value');
+    const velocityValue = document.getElementById('velocity-value');
+    const energyDisplay = document.getElementById('info-energy-tnt');
+    const radiusDisplay = document.getElementById('info-impact-radius');
 
+    // --- CONSTANTS ---
+    const ASTEROID_DENSITY = 2700; // kg/m^3 (Density of rock)
 
-    // =================================================================
-    // MOCK BACKEND DATA
-    // =================================================================
-    const mockAsteroidData = {
-      "element_count": 2,
-      "near_earth_objects": {
-        "2025-10-04": [
-          {
-            "id": "3542519",
-            "name": "Impactor-2025 (Mock)",
-            "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3542519",
-            "is_potentially_hazardous_asteroid": true,
-            "estimated_diameter": { "kilometers": { "estimated_diameter_max": 0.5 } },
-            "close_approach_data": [{ "relative_velocity": { "kilometers_per_second": "25.12" } }],
-            "impact_location": { "latitude": -19.9167, "longitude": -43.9345 }
-          },
-          {
-            "id": "3729835",
-            "name": "Secondary-Threat (Mock)",
-            "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3729835",
-            "is_potentially_hazardous_asteroid": false,
-            "estimated_diameter": { "kilometers": { "estimated_diameter_max": 0.1 } },
-            "close_approach_data": [{ "relative_velocity": { "kilometers_per_second": "15.5" } }],
-            "impact_location": { "latitude": 34.0522, "longitude": -118.2437 }
-          }
-        ]
-      }
+    // --- HELPER FUNCTIONS ---
+    function formatScientificNotation(num) {
+        if (num === null || num === undefined) return 'N/A';
+        const exponentialString = num.toExponential(1);
+        const [base, exponent] = exponentialString.split('e');
+        const cleanExponent = exponent.replace('+', '');
+        return `${base} &times; 10<sup>${cleanExponent}</sup>`;
+    }
+
+    // --- SIMULATION STATE ---
+    const simulationState = {
+        mass: 0,
+        diameter: 0,
+        velocity: 0
     };
-    const allAsteroids = Object.values(mockAsteroidData.near_earth_objects).flat();
 
+    // --- CORE FUNCTIONS ---
+    function recalculateImpact() {
+        const { mass, velocity } = simulationState;
+        const kineticEnergyJoules = 0.5 * mass * Math.pow(velocity * 1000, 2);
+        const energyKilotons = kineticEnergyJoules / 4.184e12;
+        const craterRadius = 0.1 * Math.pow(energyKilotons, 1/3);
 
-    // =================================================================
-    // INTERACTIVE CONTROLS
-    // =================================================================
-    function populateSelector() {
-        allAsteroids.forEach(asteroid => {
-            const option = document.createElement('option');
-            option.value = asteroid.id;
-            option.textContent = asteroid.name;
-            asteroidSelect.appendChild(option);
-        });
+        energyDisplay.textContent = energyKilotons.toLocaleString(undefined, { maximumFractionDigits: 0 });
+        radiusDisplay.textContent = craterRadius.toLocaleString(undefined, { maximumFractionDigits: 2 });
     }
 
-    function updateInfoPanel(asteroidId) {
-        const selectedAsteroid = allAsteroids.find(ast => ast.id === asteroidId);
-        if (selectedAsteroid) {
-            infoName.textContent = selectedAsteroid.name;
-            infoDiameter.textContent = selectedAsteroid.estimated_diameter.kilometers.estimated_diameter_max;
-            infoVelocity.textContent = parseFloat(selectedAsteroid.close_approach_data[0].relative_velocity.kilometers_per_second).toFixed(2);
-        }
-    }
-
-    asteroidSelect.addEventListener('change', (event) => {
-        const selectedId = event.target.value;
-        updateInfoPanel(selectedId);
-        visualizeImpacts(selectedId);
-    });
-
-
-    // =================================================================
-    // 2D IMPACT MAP (D3.js) - *** FIX APPLIED HERE ***
-    // =================================================================
-    const mapWidth = 700;  // Define a base width for our aspect ratio
-    const mapHeight = 550; // Define a base height for our aspect ratio
-
-    const svg = d3.select("#map-2d").append("svg")
-        // Use viewBox to make the map responsive and not dependent on initial clientHeight
-        .attr("viewBox", `0 0 ${mapWidth} ${mapHeight}`);
-
-    const projection = d3.geoMercator().scale(110).translate([mapWidth / 2, mapHeight / 1.6]);
-    const pathGenerator = d3.geoPath().projection(projection);
-
-    const tooltip = d3.select("body").append("div").attr("class", "tooltip");
-    const mapGroup = svg.append("g");
-
-    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson").then(data => {
-        mapGroup.selectAll("path")
-            .data(data.features)
-            .join("path")
-            .attr("d", pathGenerator)
-            .attr("fill", "#ccc")
-            .style("stroke", "#fff")
-            .style("stroke-width", 0.5);
-        
-        if (allAsteroids.length > 0) {
-            visualizeImpacts(allAsteroids[0].id);
-        }
-    });
-
-    function visualizeImpacts(selectedId) {
-        mapGroup.selectAll("circle")
-            .data(allAsteroids)
-            .join("circle")
-            .attr("cx", d => projection([d.impact_location.longitude, d.impact_location.latitude])[0])
-            .attr("cy", d => projection([d.impact_location.longitude, d.impact_location.latitude])[1])
-            .attr("r", d => d.estimated_diameter.kilometers.estimated_diameter_max * 10)
-            .style("fill", d => d.id === selectedId ? "orange" : "red")
-            .style("opacity", 0.8)
-            .style("stroke", d => d.id === selectedId ? "black" : "none")
-            .style("stroke-width", 2)
-            .on("mouseover", (event, d) => {
-                tooltip.style("visibility", "visible").text(d.name);
-            })
-            .on("mousemove", (event) => {
-                tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
-            })
-            .on("mouseout", () => {
-                tooltip.style("visibility", "hidden");
-            });
-    }
-
-
-    // =================================================================
-    // 3D ORBITAL SCENE (Three.js)
-    // =================================================================
-    const sceneContainer = document.getElementById('scene-3d');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, sceneContainer.clientWidth / sceneContainer.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
-    renderer.setClearColor(0x111111);
-    sceneContainer.appendChild(renderer.domElement);
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(5, 5, 5);
-    scene.add(pointLight);
-
-    const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), new THREE.MeshPhongMaterial({ color: 0x0077ff }));
-    scene.add(earth);
-    camera.position.z = 5;
-
-    allAsteroids.forEach(asteroid => {
-        const size = asteroid.estimated_diameter.kilometers.estimated_diameter_max * 0.2;
-        const asteroidMesh = new THREE.Mesh(new THREE.SphereGeometry(size, 8, 8), new THREE.MeshPhongMaterial({ color: 0x8B4513 }));
-        asteroidMesh.position.x = (Math.random() - 0.5) * 6;
-        asteroidMesh.position.y = (Math.random() - 0.5) * 6;
-        asteroidMesh.position.z = (Math.random() - 0.5) * 6;
-        scene.add(asteroidMesh);
-    });
-
-    function animate() {
-        requestAnimationFrame(animate);
-        earth.rotation.y += 0.001;
-        renderer.render(scene, camera);
-    }
-    
-
-    // =================================================================
-    // INITIALIZATION
-    // =================================================================
     function initialize() {
-        if (allAsteroids.length > 0) {
-            populateSelector();
-            const firstAsteroidId = allAsteroids[0].id;
-            asteroidSelect.value = firstAsteroidId;
-            updateInfoPanel(firstAsteroidId);
-        }
-        animate();
+        const defaultAsteroid = { mass: 1.5e10, diameter: 0.4, velocity: 12.6 };
+        simulationState.mass = defaultAsteroid.mass;
+        simulationState.diameter = defaultAsteroid.diameter;
+        simulationState.velocity = defaultAsteroid.velocity;
+
+        // Set the mass slider to the LOGARITHM of the default mass
+        massSlider.value = Math.log10(defaultAsteroid.mass);
+        diameterSlider.value = defaultAsteroid.diameter;
+        velocitySlider.value = defaultAsteroid.velocity;
+
+        massValue.innerHTML = formatScientificNotation(defaultAsteroid.mass);
+        diameterValue.textContent = `${defaultAsteroid.diameter.toFixed(2)} km`;
+        velocityValue.textContent = `${defaultAsteroid.velocity.toFixed(1)} km/s`;
+
+        recalculateImpact();
     }
 
+    // --- EVENT LISTENERS (WITH LOGARITHMIC LOGIC) ---
+
+
+    massSlider.addEventListener('input', (event) => {
+        // The slider's value is the exponent
+        const massExponent = parseFloat(event.target.value);
+        const newMass = Math.pow(10, massExponent);
+        simulationState.mass = newMass;
+        massValue.innerHTML = formatScientificNotation(newMass);
+        recalculateImpact();
+    });
+
+
+    diameterSlider.addEventListener('input', (event) => {
+        const newDiameterKm = parseFloat(event.target.value);
+        simulationState.diameter = newDiameterKm;
+        diameterValue.textContent = `${newDiameterKm.toFixed(2)} km`;
+        recalculateImpact();
+    });
+
+    velocitySlider.addEventListener('input', (event) => {
+        const newVelocity = parseFloat(event.target.value);
+        simulationState.velocity = newVelocity;
+        velocityValue.textContent = `${newVelocity.toFixed(1)} km/s`;
+        recalculateImpact();
+    });
+
+    // --- START THE APP ---
     initialize();
 
+    // --- JQUERY ENHANCEMENT ---
+    $('.info').hide().fadeIn(1000);
 });
