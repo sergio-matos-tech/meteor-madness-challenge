@@ -4,7 +4,7 @@ const searchBar = $("#search");
 let asteroidList = [];
 
 getAsteroidList().then(asteroids => {
-    searchBar.attr("placeholder", "e.g., Chicxulub (Dinosaur Killer)");
+    searchBar.attr("placeholder", "e.g., Chicxulub (Dinosaur Killer), 99942 Apophis (2004 MN4), 1862 Apollo (1932 HA), 433 Eros (1898 DQ), 1866 Sisyphus (1972 XA), 1566 Icarus (1949 MA), 1627 Ivar (1929 SH)");
     asteroidList = asteroids;
     showOptions(searchBar.val());
 }).catch(err => {
