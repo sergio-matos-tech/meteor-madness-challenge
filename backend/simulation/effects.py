@@ -21,9 +21,7 @@ def calculate_seismic_effect(kinetic_energy_joules: float) -> dict:
     # Aplica a nova fórmula diretamente
     richter_magnitude = 0.67 * math.log10(kinetic_energy_joules) - 5.87
 
-    return {
-        "richter_magnitude": richter_magnitude
-    }
+    return richter_magnitude
 
 # Bloco de teste
 if __name__ == "__main__":
@@ -43,4 +41,4 @@ if __name__ == "__main__":
             # Testando o cálculo sísmico com a nova fórmula
             seismic_results = calculate_seismic_effect(impact_energy_joules)
             print("\n--- Resultados do Efeito Sísmico ---")
-            print(f"Magnitude Richter Equivalente: {seismic_results['richter_magnitude']:.1f}")
+            #print(f"Magnitude Richter Equivalente: {seismic_results['richter_magnitude']:.1f}")

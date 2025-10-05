@@ -38,8 +38,8 @@ def test_simulation_endpoint():
     }
     return jsonify(response_data)
 
-@sim_bp.route('/test-simulation-cratering', methods=['GET'])
-def test_simulation_endpoint_cratering():
+@sim_bp.route('/test-simulation-effects', methods=['GET'])
+def test_simulation_endpoint_effects():
     """
     Endpoint de teste do MVP que executa uma simulação com dados fixos
     para o asteroide (ID "3542519") e retorna os resultados.
