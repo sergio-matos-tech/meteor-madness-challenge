@@ -13,6 +13,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // --- CONSTANTS ---
     const ASTEROID_DENSITY = 2700; // kg/m^3 (Density of rock)
 
+    
     // --- HELPER FUNCTIONS ---
     function formatScientificNotation(num) {
         if (num === null || num === undefined) return 'N/A';

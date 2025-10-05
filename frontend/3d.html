@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>3D Earth & Meteor Trajectory</title>
+	   <style>
+		   body { margin: 0; background: #111122; color: #fff; }
+		   #threejs-container { width: 100vw; height: 100vh; display: block; }
+		   .back-btn {
+			   position: absolute;
+			   top: 20px;
+			   left: 20px;
+			   z-index: 1100;
+			   width: 180px;
+			   height: auto;
+			   border: none;
+			   border-radius: 15px;
+			   box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+			   background-color: rgba(33, 37, 41, 0.9);
+			   backdrop-filter: blur(5px);
+			   color: #fff;
+			   font-size: 1.1rem;
+			   font-weight: bold;
+			   padding: 12px 0;
+			   cursor: pointer;
+			   transition: background 0.2s;
+		   }
+		   .back-btn:hover {
+			   background-color: rgba(33, 37, 41, 1);
+		   }
+	   </style>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.min.js"></script>
+</head>
+<body>
+	<button class="back-btn" onclick="window.location.href='index.html'">Back</button>
+	<div id="threejs-container"></div>
+	<script>
+		// --- Three.js Setup ---
+		const container = document.getElementById('threejs-container');
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		const scene = new THREE.Scene();
+		scene.background = new THREE.Color(0x111122);
+
+		// Camera
+		const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100000);
+		camera.position.set(0, 0, 3000);
+
+		// Renderer
+		const renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize(width, height);
+		container.appendChild(renderer.domElement);
+
+		// Orbit Controls
+		const controls = new THREE.OrbitControls(camera, renderer.domElement);
+		controls.enableDamping = true;
+		controls.dampingFactor = 0.05;
+		controls.minDistance = 100;
+		controls.maxDistance = 100000;
+		controls.target.set(0, 0, 0);
+		controls.update();
+
+		// --- Solar System Demo ---
+		// Scaled for visibility, not real distances
+		const PLANETS = [
+			{ name: 'Mercury', color: 0xaaaaaa, radius: 10, distance: 400 },
+			{ name: 'Venus', color: 0xffcc99, radius: 18, distance: 600 },
+			{ name: 'Earth', color: 0x3498db, radius: 20, distance: 800 },
+			{ name: 'Mars', color: 0xff5533, radius: 15, distance: 1000 },
+			{ name: 'Jupiter', color: 0xffe599, radius: 40, distance: 1400 },
+			{ name: 'Saturn', color: 0xf7e9a0, radius: 35, distance: 1800 },
+			{ name: 'Uranus', color: 0x99ccff, radius: 25, distance: 2200 },
+			{ name: 'Neptune', color: 0x3366cc, radius: 24, distance: 2600 }
+		];
+
+		// Sun
+		const sunGeometry = new THREE.SphereGeometry(80, 64, 64);
+		const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+		const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+		sun.position.set(0, 0, 0);
+		scene.add(sun);
+
+		// Add planets and orbits
+		PLANETS.forEach(planet => {
+			// Orbit
+			const orbitGeometry = new THREE.RingGeometry(planet.distance - 2, planet.distance + 2, 128);
+			const orbitMaterial = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+			const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+			orbit.rotation.x = Math.PI / 2;
+			scene.add(orbit);
+			// Planet
+			const planetGeometry = new THREE.SphereGeometry(planet.radius, 32, 32);
+			const planetMaterial = new THREE.MeshPhongMaterial({ color: planet.color });
+			const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+			planetMesh.position.set(planet.distance, 0, 0);
+			scene.add(planetMesh);
+			// Label
+			const div = document.createElement('div');
+			div.style.position = 'absolute';
+			div.style.color = '#fff';
+			div.style.fontSize = '1rem';
+			div.style.pointerEvents = 'none';
+			div.textContent = planet.name;
+			container.appendChild(div);
+			planetMesh.userData.labelDiv = div;
+		});
+
+		// Lighting
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+		scene.add(ambientLight);
+		const sunLight = new THREE.PointLight(0xffd700, 2, 5000);
+		sunLight.position.set(0, 0, 0);
+		scene.add(sunLight);
+
+		// Animate planets (simple circular orbits)
+		function animate() {
+			const time = Date.now() * 0.0001;
+			PLANETS.forEach((planet, i) => {
+				const mesh = scene.children.find(obj => obj instanceof THREE.Mesh && obj.geometry.type === 'SphereGeometry' && obj.material.color.getHex() === planet.color);
+				if (mesh) {
+					const angle = time * (0.2 + i * 0.05);
+					mesh.position.x = Math.cos(angle) * planet.distance;
+					mesh.position.z = Math.sin(angle) * planet.distance;
+					// Label position
+					const vector = mesh.position.clone();
+					vector.project(camera);
+					const x = (vector.x * 0.5 + 0.5) * width;
+					const y = (-vector.y * 0.5 + 0.5) * height;
+					mesh.userData.labelDiv.style.left = `${x}px`;
+					mesh.userData.labelDiv.style.top = `${y}px`;
+				}
+			});
+			controls.update();
+			renderer.render(scene, camera);
+			requestAnimationFrame(animate);
+		}
+		animate();
+
+		// Responsive resize
+		window.addEventListener('resize', () => {
+			const newWidth = window.innerWidth;
+			const newHeight = window.innerHeight;
+			camera.aspect = newWidth / newHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(newWidth, newHeight);
+		});
+	</script>
+</body>
+</html>
