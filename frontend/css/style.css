@@ -133,3 +133,7 @@
 body {
     overflow: hidden;
 }
+
+.controls-container {
+    max-width: 400px;
+}
