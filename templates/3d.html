@@ -1,146 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>3D Earth & Meteor Trajectory</title>
-	   <style>
-		   body { margin: 0; background: #111122; color: #fff; }
-		   #threejs-container { width: 100vw; height: 100vh; display: block; }
-		   .action-btn {
-			   position: absolute;
-			   top: 20px;
-			   z-index: 1100;
-			   width: 180px;
-			   height: auto;
-			   border: none;
-			   border-radius: 15px;
-			   box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-			   background-color: rgba(33, 37, 41, 0.9);
-			   backdrop-filter: blur(5px);
-			   color: #fff;
-			   font-size: 1.1rem;
-			   font-weight: bold;
-			   padding: 12px 0;
-			   cursor: pointer;
-			   transition: background 0.2s;
-		   }
-           .action-btn:hover {
-			   background-color: rgba(33, 37, 41, 1);
-		   }
-		   .back-btn {
-			   left: 20px;
-		   }
-           .launch-btn {
-               left: 220px;
-               background-color: rgba(220, 53, 69, 0.9);
-           }
-           .launch-btn:hover {
-               background-color: rgba(220, 53, 69, 1);
-           }
-	   </style>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Earth & Meteor Trajectory</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <style>
+        body { margin: 0; background: #111122; color: #fff; }
+        #threejs-container { width: 100vw; height: 100vh; display: block; cursor: grab; }
+        .action-btn {
+            position: absolute; top: 20px; z-index: 1100;
+            width: 180px; height: auto; border: none; border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            background-color: rgba(33, 37, 41, 0.9);
+            backdrop-filter: blur(5px);
+            color: #fff; font-size: 1.1rem; font-weight: bold;
+            padding: 12px 0; cursor: pointer; transition: background 0.2s;
+        }
+        .action-btn:hover { background-color: rgba(33, 37, 41, 1); }
+        .back-btn { left: 20px; }
+        .launch-btn { left: 220px; background-color: rgba(220, 53, 69, 0.9); }
+        .launch-btn:hover { background-color: rgba(220, 53, 69, 1); }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.min.js"></script>
 </head>
 <body>
-	<button class="action-btn back-btn" onclick="window.location.href='/'">Back</button>
+    <button class="action-btn back-btn" onclick="window.location.href='/'">Back</button>
     <button class="action-btn launch-btn" id="launch-meteor-btn">Launch Meteor</button>
-	<div id="threejs-container"></div>
-	<script>
-		// --- Three.js Setup ---
-		const container = document.getElementById('threejs-container');
-		const width = window.innerWidth;
-		const height = window.innerHeight;
-		const scene = new THREE.Scene();
-		scene.background = new THREE.Color(0x111122);
+    <div id="threejs-container"></div>
+    <script>
+        // --- Three.js Setup ---
+        const container = document.getElementById('threejs-container');
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x111122);
 
-		// Camera
-		const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100000);
-		camera.position.set(0, 0, 3000);
+        // Camera
+        const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100000);
+        camera.position.set(0, 0, 3000);
 
-		// Renderer
-		const renderer = new THREE.WebGLRenderer({ antialias: true });
-		renderer.setSize(width, height);
-		container.appendChild(renderer.domElement);
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(width, height);
+        container.appendChild(renderer.domElement);
 
-		// Orbit Controls
-		const controls = new THREE.OrbitControls(camera, renderer.domElement);
-		controls.enableDamping = true;
-		controls.dampingFactor = 0.05;
-		controls.minDistance = 100;
-		controls.maxDistance = 100000;
-		controls.target.set(0, 0, 0);
-		controls.update();
+        // Orbit Controls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 100;
+        controls.maxDistance = 100000;
+        controls.target.set(0, 0, 0);
+        controls.update();
 
-		// --- Solar System Demo ---
-		const PLANETS = [
-			{ name: 'Mercury', color: 0xaaaaaa, radius: 10, distance: 400 },
-			{ name: 'Venus', color: 0xffcc99, radius: 18, distance: 600 },
-			{ name: 'Earth', color: 0x3498db, radius: 20, distance: 800 },
-			{ name: 'Mars', color: 0xff5533, radius: 15, distance: 1000 },
-			{ name: 'Jupiter', color: 0xffe599, radius: 40, distance: 1400 },
-			{ name: 'Saturn', color: 0xf7e9a0, radius: 35, distance: 1800 },
-			{ name: 'Uranus', color: 0x99ccff, radius: 25, distance: 2200 },
-			{ name: 'Neptune', color: 0x3366cc, radius: 24, distance: 2600 }
-		];
+        // --- NEW: Add event listeners for cursor change ---
+        controls.addEventListener('start', () => {
+            container.style.cursor = 'grabbing';
+        });
+        controls.addEventListener('end', () => {
+            container.style.cursor = 'grab';
+        });
 
-        const collidableObjects = []; // Array for collision detection
 
-		// Sun
-		const sunGeometry = new THREE.SphereGeometry(80, 64, 64);
-		const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-		const sun = new THREE.Mesh(sunGeometry, sunMaterial);
-		sun.position.set(0, 0, 0);
-        sun.name = "Sun"; // Give it a name for identification
-		scene.add(sun);
+        // --- Solar System Demo ---
+        const PLANETS = [
+            { name: 'Mercury', color: 0xaaaaaa, radius: 10, distance: 400 },
+            { name: 'Venus', color: 0xffcc99, radius: 18, distance: 600 },
+            { name: 'Earth', color: 0x3498db, radius: 20, distance: 800 },
+            { name: 'Mars', color: 0xff5533, radius: 15, distance: 1000 },
+            { name: 'Jupiter', color: 0xffe599, radius: 40, distance: 1400 },
+            { name: 'Saturn', color: 0xf7e9a0, radius: 35, distance: 1800 },
+            { name: 'Uranus', color: 0x99ccff, radius: 25, distance: 2200 },
+            { name: 'Neptune', color: 0x3366cc, radius: 24, distance: 2600 }
+        ];
+
+        const collidableObjects = [];
+
+        // Sun
+        const sunGeometry = new THREE.SphereGeometry(80, 64, 64);
+        const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        sun.position.set(0, 0, 0);
+        sun.name = "Sun";
+        scene.add(sun);
         collidableObjects.push(sun);
         
         let earthMesh;
 
-		// Add planets and orbits
-		PLANETS.forEach(planet => {
-			const orbitGeometry = new THREE.RingGeometry(planet.distance - 2, planet.distance + 2, 128);
-			const orbitMaterial = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
-			const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
-			orbit.rotation.x = Math.PI / 2;
-			scene.add(orbit);
-			
-			const planetGeometry = new THREE.SphereGeometry(planet.radius, 32, 32);
-			const planetMaterial = new THREE.MeshPhongMaterial({ color: planet.color });
-			const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
-            planetMesh.name = planet.name; // Give it a name
-			planetMesh.position.set(planet.distance, 0, 0);
-			scene.add(planetMesh);
-			
+        // Add planets and orbits
+        PLANETS.forEach(planet => {
+            const orbitGeometry = new THREE.RingGeometry(planet.distance - 2, planet.distance + 2, 128);
+            const orbitMaterial = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+            const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+            orbit.rotation.x = Math.PI / 2;
+            scene.add(orbit);
+            
+            const planetGeometry = new THREE.SphereGeometry(planet.radius, 32, 32);
+            const planetMaterial = new THREE.MeshPhongMaterial({ color: planet.color });
+            const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+            planetMesh.name = planet.name;
+            planetMesh.position.set(planet.distance, 0, 0);
+            scene.add(planetMesh);
+            
             if (planet.name === 'Earth') {
                 earthMesh = planetMesh;
             } else {
-                collidableObjects.push(planetMesh); // Add all other planets to collidable list
+                collidableObjects.push(planetMesh);
             }
 
-			const div = document.createElement('div');
-			div.style.position = 'absolute';
-			div.style.color = '#fff';
-			div.style.fontSize = '1rem';
-			div.style.pointerEvents = 'none';
-			div.textContent = planet.name;
-			container.appendChild(div);
-			planetMesh.userData.labelDiv = div;
-		});
+            const div = document.createElement('div');
+            div.style.position = 'absolute';
+            div.style.color = '#fff';
+            div.style.fontSize = '1rem';
+            div.style.pointerEvents = 'none';
+            div.textContent = planet.name;
+            container.appendChild(div);
+            planetMesh.userData.labelDiv = div;
+        });
 
-		// Lighting
-		const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-		scene.add(ambientLight);
-		const sunLight = new THREE.PointLight(0xffd700, 2, 5000);
-		sunLight.position.set(0, 0, 0);
-		scene.add(sunLight);
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const sunLight = new THREE.PointLight(0xffd700, 2, 5000);
+        sunLight.position.set(0, 0, 0);
+        scene.add(sunLight);
 
         // --- Meteor Simulation ---
         let meteor, impactEffect;
         let startPosition;
-        let animationProgress = 0;
         let isAnimatingMeteor = false;
-        const raycaster = new THREE.Raycaster(); // For collision detection
+        const raycaster = new THREE.Raycaster();
 
         document.getElementById('launch-meteor-btn').addEventListener('click', () => {
             if (isAnimatingMeteor) return;
@@ -159,7 +152,6 @@
             meteor.position.copy(startPosition);
             scene.add(meteor);
             
-            animationProgress = 0;
             isAnimatingMeteor = true;
         });
         
@@ -169,22 +161,22 @@
         let shakeDuration = 0;
         let shakeIntensity = 0;
 
-		function animate() {
-			const time = Date.now() * 0.0001;
-			PLANETS.forEach((planet, i) => {
-				const mesh = scene.children.find(obj => obj.name === planet.name);
-				if (mesh) {
-					const angle = time * (0.2 + i * 0.05);
-					mesh.position.x = Math.cos(angle) * planet.distance;
-					mesh.position.z = Math.sin(angle) * planet.distance;
-					const vector = mesh.position.clone();
-					vector.project(camera);
-					const x = (vector.x * 0.5 + 0.5) * width;
-					const y = (-vector.y * 0.5 + 0.5) * height;
-					mesh.userData.labelDiv.style.left = `${x}px`;
-					mesh.userData.labelDiv.style.top = `${y}px`;
-				}
-			});
+        function animate() {
+            const time = Date.now() * 0.0001;
+            PLANETS.forEach((planet, i) => {
+                const mesh = scene.children.find(obj => obj.name === planet.name);
+                if (mesh) {
+                    const angle = time * (0.2 + i * 0.05);
+                    mesh.position.x = Math.cos(angle) * planet.distance;
+                    mesh.position.z = Math.sin(angle) * planet.distance;
+                    const vector = mesh.position.clone();
+                    vector.project(camera);
+                    const x = (vector.x * 0.5 + 0.5) * width;
+                    const y = (-vector.y * 0.5 + 0.5) * height;
+                    mesh.userData.labelDiv.style.left = `${x}px`;
+                    mesh.userData.labelDiv.style.top = `${y}px`;
+                }
+            });
 
             if (isAnimatingMeteor) {
                 const endPosition = earthMesh.position.clone();
@@ -209,9 +201,9 @@
             }
 
             if (impactEffect) {
-                impactEffect.scale.x *= 1.0115; 
-                impactEffect.scale.y *= 1.0115;
-                impactEffect.scale.z *= 1.0115;
+                impactEffect.scale.x *= 1.0117; 
+                impactEffect.scale.y *= 1.0117;
+                impactEffect.scale.z *= 1.0117;
                 impactEffect.material.opacity *= 0.98;
                 if (impactEffect.material.opacity < 0.01) {
                     scene.remove(impactEffect);
@@ -231,11 +223,11 @@
                 }
             }
 
-			controls.update();
-			renderer.render(scene, camera);
-			requestAnimationFrame(animate);
-		}
-		animate();
+            controls.update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
 
         function createImpactEffect(position) {
             const impactGeometry = new THREE.SphereGeometry(10, 32, 32);
@@ -248,8 +240,7 @@
             impactEffect.position.copy(position);
             scene.add(impactEffect);
             
-            // Trigger screen shake
-            shakeScreen(30, 700);
+            shakeScreen(20, 500);
         }
 
         function shakeScreen(intensity, duration) {
@@ -259,13 +250,13 @@
             shakeStartTime = Date.now();
         }
 
-		window.addEventListener('resize', () => {
-			const newWidth = window.innerWidth;
-			const newHeight = window.innerHeight;
-			camera.aspect = newWidth / newHeight;
-			camera.updateProjectionMatrix();
-			renderer.setSize(newWidth, newHeight);
-		});
-	</script>
+        window.addEventListener('resize', () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newWidth, newHeight);
+        });
+    </script>
 </body>
 </html>

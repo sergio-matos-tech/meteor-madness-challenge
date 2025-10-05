@@ -3,41 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Meteor Madness</title>
-
-    
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
-    <link
-        rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin=""
-    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-    
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
 
     <div class="search-container over-map">
-        <input id="search" class="form-control mt-3 bg-dark text-light py-2 px-3" type="text">
+        <input id="search" class="form-control mt-3 bg-dark text-light py-2 px-3" type="text" placeholder="e.g., Chicxulub (Dinosaur Killer)">
         <ul id="options-container" class="card"></ul>
     </div>
     
     <div class="card over-map info m-3 bg-dark text-light controls-container">
-        <img
-            id="asteroid"
-            class="over-map"
-            src="{{ url_for('static', filename='images/asteroid.png') }}"
-            draggable="false"
-        >
-
+        <img id="asteroid" class="over-map" src="{{ url_for('static', filename='images/asteroid.png') }}" draggable="false">
         <div class="card-body">
-            <h5 class="card-title border-bottom pb-2">
-                <i class="fas fa-sliders-h"></i>
-                <span id="asteroid-name">Impact Simulator</span>
-            </h5>
-            
+            <h5 class="card-title border-bottom pb-2"><i class="fas fa-sliders-h"></i> <span id="asteroid-name">Impact Simulator</span></h5>
             <div class="slider-control">
                 <label for="mass-slider" class="form-label"><i class="fas fa-weight-hanging fa-fw"></i> Mass</label>
                 <input type="range" class="form-range" id="mass-slider" min="9" max="15" step="0.05">
@@ -45,7 +28,7 @@
             </div>
             <div class="slider-control">
                 <label for="diameter-slider" class="form-label"><i class="fas fa-arrows-alt-h fa-fw"></i> Diameter</label>
-                <input type="range" class="form-range" id="diameter-slider" min="0.1" max="3.0" step="0.01">
+                <input type="range" class="form-range" id="diameter-slider" min="0.1" max="15.0" step="0.01">
                 <span class="slider-value" id="diameter-value">N/A</span>
             </div>
             <div class="slider-control">
@@ -53,7 +36,6 @@
                 <input type="range" class="form-range" id="velocity-slider" min="5" max="100" step="0.1">
                 <span class="slider-value" id="velocity-value">N/A</span>
             </div>
-            
             <div class="results-panel mt-3 pt-3 border-top">
                 <div class="result-item">
                     <h6><i class="fas fa-bomb"></i> Impact Energy (kt)</h6>
@@ -75,56 +57,30 @@
         </div>
     </div>
 
-    <!-- Leaflet Map Container -->
     <div id="map"></div>
 
-    
-    <!-- ---------- Scripts ---------- -->
-
-    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
     <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-
-    <!-- Asteroid -->
-    <script src="{{ url_for('static', filename='js/asteroid.js') }}"></script>
-
-    <!-- Controls -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <script src="{{ url_for('static', filename='js/controls.js') }}"></script>
-
-    <!-- Drag and drop -->
-    <script src="{{ url_for('static', filename='js/drag.js') }}"></script>
-
-    <!-- Search Bar -->
+    <script src="{{ url_for('static', filename='js/asteroid.js') }}"></script>
     <script src="{{ url_for('static', filename='js/search.js') }}"></script>
-
-    <!-- Map -->
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin="">
-    </script>
-    <script src="{{ url_for('static', filename='js/map.js') }}"></script>    
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/drag.js') }}"></script>
     
     <script>
-        // Simple preview rendering (meteor and earth)
+        // Simple preview rendering
         const canvas = document.getElementById('preview-canvas');
         if (canvas) {
             const ctx = canvas.getContext('2d');
-            // Draw earth
+            ctx.fillStyle = '#3498db';
             ctx.beginPath();
             ctx.arc(80, 90, 50, 0, 2 * Math.PI);
-            ctx.fillStyle = '#3498db';
-            ctx.shadowColor = '#222';
-            ctx.shadowBlur = 10;
             ctx.fill();
-            ctx.shadowBlur = 0;
-            // Draw meteor
+            ctx.fillStyle = '#ff9800';
             ctx.beginPath();
             ctx.arc(320, 60, 18, 0, 2 * Math.PI);
-            ctx.fillStyle = '#ff9800';
-            ctx.globalAlpha = 0.9;
             ctx.fill();
-            ctx.globalAlpha = 1;
-            // Trajectory line
             ctx.beginPath();
             ctx.moveTo(80, 90);
             ctx.quadraticCurveTo(200, 10, 320, 60);
@@ -132,12 +88,8 @@
             ctx.lineWidth = 4;
             ctx.setLineDash([8, 8]);
             ctx.stroke();
-            ctx.setLineDash([]);
         }
-        // Button event to go to 3D page
-        document.getElementById('view-3d-btn').onclick = function() {
-            window.location.href = '3d';
-        };
+        document.getElementById('view-3d-btn').onclick = () => window.location.href = '/3d';
     </script>
 </body>
 </html>

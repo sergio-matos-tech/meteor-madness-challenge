@@ -1,84 +1,62 @@
-$(window).on('DOMContentLoaded', () => {
+// Sliders and Value Displays
+const massSlider = $("#mass-slider"), massValue = $("#mass-value");
+const diameterSlider = $("#diameter-slider"), diameterValue = $("#diameter-value");
+const velocitySlider = $("#velocity-slider"), velocityValue = $("#velocity-value");
 
-    // --- DOM ELEMENT REFERENCES ---
-    const asteroidName = $("#asteroid-name")
-    const massSlider = $('#mass-slider')
-    const diameterSlider = $('#diameter-slider')
-    const velocitySlider = $('#velocity-slider')
-    const massValue = $('#mass-value')
-    const diameterValue = $('#diameter-value')
-    const velocityValue = $('#velocity-value')
-    const energyDisplay = $('#info-energy-tnt')
-    const radiusDisplay = $('#info-impact-radius')
+// Info Panel and Title
+const energyDisplay = $("#info-energy-tnt");
+const craterRadiusDisplay = $("#info-impact-radius");
+const asteroidNameDisplay = $("#asteroid-name");
 
-    // --- HELPER FUNCTIONS ---
-    function formatScientificNotation(num) {
-        if (num === null || num === undefined) return 'N/A';
-        const exponentialString = num.toExponential(1);
-        const [base, exponent] = exponentialString.split('e');
-        const cleanExponent = exponent.replace('+', '');
-        return `${base} &times; 10<sup>${cleanExponent}</sup>`;
-    }
+function updateInfoPanel(state) {
+    energyDisplay.text(state.energyKilotons ? state.energyKilotons.toExponential(2) : "N/A");
+    craterRadiusDisplay.text(state.craterRadius ? state.craterRadius.toFixed(2) : "N/A");
+}
 
-    // --- CORE FUNCTIONS ---
-    function updateDisplay() {
-        // Set the mass slider to the LOGARITHM of the default mass
-        massSlider.val(Math.log10(asteroid.mass))
-        diameterSlider.val(asteroid.diameter)
-        velocitySlider.val(asteroid.velocity)
+function updateSliders(state) {
+    if (state.mass) massSlider.val(Math.log10(state.mass));
+    if (state.diameter) diameterSlider.val(state.diameter);
+    if (state.velocity) velocitySlider.val(state.velocity);
+    
+    massValue.text(state.mass ? `${(state.mass / 1e9).toExponential(2)} Gt` : "N/A");
+    diameterValue.text(state.diameter ? `${state.diameter.toFixed(2)} km` : "N/A");
+    velocityValue.text(state.velocity ? `${state.velocity.toFixed(2)} km/s` : "N/A");
+}
 
-        asteroidName.text(asteroid.name)
+function updateTitle(name) {
+    asteroidNameDisplay.text(name);
+}
 
-        massValue.html(formatScientificNotation(asteroid.mass))
-        diameterValue.text(`${asteroid.diameter.toFixed(2)} km`)
-        velocityValue.text(`${asteroid.velocity.toFixed(1)} km/s`)
+function updateUI(state) {
+    updateTitle(state.name);
+    updateSliders(state);
+    updateInfoPanel(state);
+}
 
-        asteroid.calculateImpact()
-        
-        energyDisplay.text(asteroid.energyKilotons.toLocaleString(undefined, { maximumFractionDigits: 0 }))
-        radiusDisplay.text(asteroid.craterRadius.toLocaleString(undefined, { maximumFractionDigits: 2 }))
-    }
-    asteroid.setUpdateDisplayFunc(updateDisplay)
+// Event Listeners for Sliders
+massSlider.on("input", () => {
+    const actualMass = Math.pow(10, parseFloat(massSlider.val()));
+    asteroid.setMass(actualMass);
+    asteroid.setName("Custom Simulation");
+    asteroid.calculateImpact();
+    massValue.text(`${(actualMass / 1e9).toExponential(2)} Gt`);
+    updateTitle(asteroid.name);
+});
 
-    function initialize() {
-        asteroid.setMass(1.5e10) // Default mass
-        asteroid.setDiameter(0.4) // Default diameter
-        asteroid.setVelocity(12.6) // Default velocity
+diameterSlider.on("input", () => {
+    const diameter = parseFloat(diameterSlider.val());
+    asteroid.setDiameter(diameter);
+    asteroid.setName("Custom Simulation");
+    asteroid.calculateImpact();
+    diameterValue.text(`${diameter.toFixed(2)} km`);
+    updateTitle(asteroid.name);
+});
 
-        asteroid.name = "Lobotomy Asteroid"
-
-        updateDisplay()
-    }
-
-    // --- EVENT LISTENERS (WITH LOGARITHMIC LOGIC) ---
-
-    massSlider.on('input', (event) => {
-        // The slider's value is the exponent
-        const massExponent = parseFloat(event.target.value);
-        const newMass = Math.pow(10, massExponent);        
-        asteroid.setMass(newMass);
-
-        updateDisplay()
-    });
-
-
-    diameterSlider.on('input', (event) => {
-        const newDiameterKm = parseFloat(event.target.value)        
-        asteroid.setDiameter(newDiameterKm)
-        
-        updateDisplay()
-    });
-
-    velocitySlider.on('input', (event) => {
-        const newVelocity = parseFloat(event.target.value)
-        asteroid.setVelocity(newVelocity)
-        
-        updateDisplay()
-    });
-
-    // --- START THE APP ---
-    initialize()
-
-    // --- JQUERY ENHANCEMENT ---
-    $('.info').hide().fadeIn(1000)
+velocitySlider.on("input", () => {
+    const velocity = parseFloat(velocitySlider.val());
+    asteroid.setVelocity(velocity);
+    asteroid.setName("Custom Simulation");
+    asteroid.calculateImpact();
+    velocityValue.text(`${velocity.toFixed(2)} km/s`);
+    updateTitle(asteroid.name);
 });
