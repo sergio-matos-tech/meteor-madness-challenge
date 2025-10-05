@@ -27,8 +27,15 @@ const asteroid = {
         this.craterRadius = 0.1 * Math.pow(this.energyKilotons, 1/3);
     },
 
-    async load(id) {
-        console.log("Asteroide selecionado:", { id })
+    async load(id, onLoad = null) {
+        $.ajax({
+            url: `http://localhost:5000/api/v1/cratering/results?asteroid_id=${id}`,
+            type: "GET",
+            dataType: "json",
+            success: (response) => console.log(response),
+            error: (xhr, status, error) => console.error(status, error),
+            complete: () => onLoad?.()
+        });
     },
     
     throw({ lat, lng }) {
