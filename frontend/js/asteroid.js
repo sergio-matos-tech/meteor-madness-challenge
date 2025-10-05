@@ -1,11 +1,39 @@
 const asteroid = {
+    mass: null,
+    diameter: null,
+    velocity: null,
+
+    energyKilotons: null,
+    craterRadius: null,
+
+    setMass(mass) {
+        this.mass = mass
+        this.calculateImpact()
+    },
+
+    setDiameter(diameter) {
+        this.diameter = diameter
+        this.calculateImpact()
+    },
+
+    setVelocity(velocity) {
+        this.velocity = velocity
+        this.calculateImpact()
+    },
+
+    calculateImpact() {
+        const kineticEnergyJoules = 0.5 * this.mass * Math.pow(this.velocity * 1000, 2);
+        this.energyKilotons = kineticEnergyJoules / 4.184e12;
+        this.craterRadius = 0.1 * Math.pow(this.energyKilotons, 1/3);
+    },
+
     async load(id) {
         console.log("Asteroide selecionado:", { id })
     },
+    
     throw({ lat, lng }) {
-        // TODO: fazer isso dinâmico
-        const outerRadius = 5000000;
-        const innerRadius = 2500000;
+        const outerRadius = this.craterRadius * 1000;
+        const innerRadius = this.craterRadius * 1000 / 2; // TODO: Melhorar isso
 
         const outer = L.circle([lat, lng], {
             radius: 0,

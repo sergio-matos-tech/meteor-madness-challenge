@@ -14,58 +14,6 @@
     />
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-
-    <style>
-        #search {
-            width: 70%;
-            border-radius: 15px;
-        }
-
-        #options-container {
-            width: 70%;
-            border-radius: 15px;
-            list-style-type: none;
-            padding: 5px;
-        }
-
-        .option {
-            padding: 3px 20px;
-            border-radius: 10px;
-        }
-        
-        .option.valid:hover {
-            cursor: pointer;
-            background-color: #dfdfdf;
-        }
-
-        .search-container {
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-            width: 100vw;
-            gap: 6px;
-        }
-
-        #asteroid {
-            width: 50px;
-            height: 50px;
-            background: dodgerblue;
-            position: absolute;
-            cursor: grab;
-            border-radius: 50%;
-            bottom: 0;
-            right: 0;
-            transition: transform 0.15s ease;
-        }
-
-        #asteroid:hover {
-            transform: scale(1.1);
-        }
-
-        body {
-            overflow: hidden;
-        }
-    </style>
     
 </head>
 <body>
@@ -74,12 +22,10 @@
         <input id="search" class="form-control mt-3" type="text">
         <ul id="options-container" class="card"></ul>
     </div>
-
-     <!-- <div class="card over-map info m-3 ">
-        <div id="asteroid" class="over-map"></div>
-    </div> -->
-
+    
     <div class="card over-map info m-3 bg-dark text-light">
+        <div id="asteroid" class="over-map"></div>
+
         <div class="card-body">
             <h5 class="card-title border-bottom pb-2"><i class="fas fa-sliders-h"></i> Impact Simulator</h5>
             
@@ -114,14 +60,18 @@
     
     <div id="map"></div>
 
+    
+    <!-- ---------- Scripts ---------- -->
+
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
    <script src="js/jquery.js"></script>
 
-    <script src="js/main.js"></script>
-
     <!-- Asteroid -->
     <script src="js/asteroid.js"></script>
-    
+
+    <!-- Controls -->
+    <script src="js/controls.js"></script>
+
     <!-- Drag and drop -->
     <script src="js/drag.js"></script>
 
