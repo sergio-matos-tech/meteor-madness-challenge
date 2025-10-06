@@ -1,8 +1,4 @@
-# Website Link: https://meteor-madness-challenge.onrender.com/
-
 ## Meteor Madness
-
-Made as part of [NASA Space Apps Challenge 2025](https://www.spaceappschallenge.org/2025/challenges/meteor-madness)
 
 ### The Problem
 
@@ -16,3 +12,9 @@ The Lobotomia Soluções team has taken it upon themselves to create an interact
 * Evaluate potential mitigation strategies.
 
 The tool should be user-friendly and accessible to scientists and the general public. It should bridge the gap between complex scientific data and actionable insights, helping to improve public understanding and spreading awareness of the risks posed by near-Earth objects.
+
+### Links
+
+Our Project's [Website](https://meteor-madness-challenge.onrender.com/)
+
+Made as part of [NASA Space Apps Challenge 2025](https://www.spaceappschallenge.org/2025/challenges/meteor-madness)
